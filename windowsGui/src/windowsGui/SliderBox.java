@@ -12,13 +12,13 @@ public class SliderBox{
 	public BMS Bms;
 	public PApplet applet;
 	public float x,y,bx = x,by = y,w,bw = w,h,bh = h,vspacing,hspacing,r1,r2,r3,r4,rx,transparency,ghSpacing,gvSpacing;
-	public int id,cols,rows,themeIndex,tabIndex,BMSIndex;
+	public int id,cols,rows,themeIndex,arrayIndex;
 	Slider sliderR,sliderB,sliderG,sliderSelected;
 	public ArrayList<Slider> sliders = new ArrayList<Slider>();
 	String type;
 	public PVector mouse,mouse2;
 	public boolean vertical, horizontal = true,draggable,saved,tdown,mdown,parentCanvas,t2down,m3down,m4down,
-			border,pie;
+			border,pie,BMSbound;
 	public boolean visible = true,localTheme,grid;
 	public Menu menu;
 	public Menu tooltip;
@@ -515,7 +515,7 @@ public class SliderBox{
 						} 
 					}}t2down = false; }
 
-			if(tooltip.items.get(1).pos()&&applet.mousePressed)save();
+//			if(tooltip.items.get(1).pos()&&applet.mousePressed)save();
 
 			//important
 			//if(tooltip.items.get(2).pos())load.listen1();
@@ -619,7 +619,7 @@ public class SliderBox{
 				t2down = false;
 			}
 			if(tooltip.items.get(1).pos(mouse)&&applet.mousePressed){
-				save();
+//				save();
 				t2down = false;
 			}
 			if(tooltip.items.get(2).pos(mouse)){
@@ -716,18 +716,84 @@ public class SliderBox{
 
 	public void save(){
 		//important
-		if(save.location!=null){
-			save.setLocation(save.location);
-			save.open();
-			for(int i=0;i<sliders.size();i++){
+		applet.println("save sliderBox");
+		Bms.output.writeLine("");
+		Bms.output.writeLine("sliderBox");
+		Bms.output.writeLine("themeIndex",themeIndex);
+		Bms.output.writeLine("localTheme",localTheme);
+//		Bms.output.writeLine("tooltip,"+tooltip);
+		Bms.output.write(x+",");
+		Bms.output.write(y+",");
+		Bms.output.write(w+",");
+		Bms.output.write(h+",");
+		Bms.output.write(y+",");
+		Bms.output.write(label+",");
+		Bms.output.writeLine("");
+		
+		for(int i=0;i<menu.sliders.size();i++) {
+			Slider s = menu.sliders.get(i);
+			
+			Bms.output.writeLine("Slider+++++,"+i+","+s.label+","+s.value+","+s.valuex);
+//			Bms.output.writeLine("tooltip"+tooltip);
+		}
+//		Bms.output.write("Type,");
+//		if(menu.classicBar)Bms.output.write("classicBar");
+//		else if(menu.classicSquare)Bms.output.write("cif(lassicSquare");
+//		else if(menu.classicRadio)Bms.output.write("classicRadio");
+//		else if(grid) {
+//			Bms.output.write("grid");
+//		}
+//		else if(menu.pieSquare)Bms.output.write("pieSquare");
+//		else Bms.output.write("plain");
+		Bms.output.writeLine("");
+		applet.println("saved tab menu");
+//		if(save!=null&&save.location!=null){
+//			save.setLocation(save.location);
+//			save.open();
+//			for(int i=0;i<sliders.size();i++){
+//
+//				Slider s = sliders.get(i);
+//				save.write((s.value));
+//			}
+//			save.close();
+//		}
+	};
+	
+	public void defaultSave(){
+		//important
+		applet.println("save sliderBox");
+		Bms.output.writeLine("");
+		Bms.output.writeLine("sliderBox");
+		Bms.output.writeLine("themeIndex",themeIndex);
+		Bms.output.writeLine("localTheme",localTheme);
+//		Bms.output.writeLine("tooltip,"+tooltip);
+		Bms.output.write(x+",");
+		Bms.output.write(y+",");
+		Bms.output.write(w+",");
+		Bms.output.write(h+",");
+		Bms.output.writeLine(label+",");
+		
+		
+//		Bms.output.write("Type,");
+//		if(menu.classicBar)Bms.output.write("classicBar");
+//		else if(menu.classicSquare)Bms.output.write("cif(lassicSquare");
+//		else if(menu.classicRadio)Bms.output.write("classicRadio");
+//		else if(grid) {
+//			Bms.output.write("grid");
+//		}
+//		else if(menu.pieSquare)Bms.output.write("pieSquare");
+//		else Bms.output.write("plain");
+		if(BMSbound)Bms.output.writeLine("BmsBound");
+		Bms.output.writeLine("arrayIndex",arrayIndex);
+		Bms.output.writeLine("");
+		for(int i=0;i<menu.sliders.size();i++){
 
-				Slider s = sliders.get(i);
-				save.write((s.value));
-			}
-			save.close();
+			Slider s = menu.sliders.get(i);
+			
+			Bms.output.writeLine("Slider:::"+","+i+","+s.value+","+s.valuex+","+s.start+","+s.end);
 		}
 	};
-
+	
 	public void setColor(){
 		for(int i=0;i<menu.sliders.size();i++){
 			Slider s = getSlider(i);

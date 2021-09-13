@@ -9,8 +9,8 @@ public class Dropdown extends Menu {
 	//	  PApplet applet;
 	public Slider slider;
 	public float windowx,bwindowx,hiddenw,r1,r2,r3,r4,txoff,tyoff;
-	public int dcount,windowSize = 5,tabIndex,BMSIndex;
-	public boolean dclick,visible = true,dclose,draggable,mcoord;
+	public int dcount,windowSize = 5,arrayIndex;
+	public boolean dclick,visible = true,dclose,draggable,mcoord,BMSbound;
 	public Button title;
 	public Boundary boundary;
 	public PVector mouse;
@@ -363,7 +363,7 @@ public class Dropdown extends Menu {
 
 			applet.fill(255);
 			applet.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
-			applet.fill(col);
+			applet.fill(theme.dockfillcol);
 			applet.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
 		}
 
@@ -429,9 +429,7 @@ public class Dropdown extends Menu {
 		if(dclick&&slider!=null){
 			canvas.fill(255);
 			canvas.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
-			canvas.fill(col);
-			if(localTheme)canvas.fill(fcol);
-
+			canvas.fill(theme.dropdownfillcol);
 			canvas.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
 		}
 
@@ -615,7 +613,7 @@ public class Dropdown extends Menu {
 		applet.rect(x,y,w,h,r1,r2,r4,r4);
 		applet.fill(theme.dropdowntextcol);
 		applet.pushStyle();
-		applet.textFont(theme.tabfont);
+		applet.textFont(theme.tabFont);
 		applet.textSize(theme.dropdowntextsize);
 		applet.text(label,x+2+txoff,y+tsize+2+tyoff);
 		applet.popStyle();
@@ -633,7 +631,7 @@ public class Dropdown extends Menu {
 		canvas.rect(x,y,w,h,r1,r2,r4,r4);
 		canvas.fill(theme.dropdowntextcol);
 		canvas.pushStyle();
-		canvas.textFont(theme.tabfont);
+		canvas.textFont(theme.tabFont);
 		canvas.textSize(theme.dropdowntextsize);
 		canvas.text(label,x+2+txoff,y+tsize+2+tyoff);
 		canvas.popStyle();
@@ -811,6 +809,45 @@ public class Dropdown extends Menu {
 			b.applet = applet;
 		}
 
+	};
+	
+	public void setTextColor(int c) {
+		initColors();
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.dropdowntextcol = c;
+		theme = newTheme;
+	};
+	
+	public void setTextColor(float a, float b,float c,float d) {
+		initColors();
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.dropdowntextcol = applet.color(a,b,c,d);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		for(int i=0;i<items.size();i++) {
+			Button b1 = items.get(i);
+			b1.setTextCol(a);
+		}
+	};
+	
+	public void setTextCol(int c) {
+		initColors();
+		tcol = c;
+		localTheme = true;
+	};
+	
+	public void setTextCol(float a, float b,float c,float d) {
+		initColors();
+		tcol = applet.color(a,b,c,d);
+		localTheme = true;
+	};
+	
+	public void save() {
+		
+	};
+	
+	public void defaultSave() {
+		
 	};
 
 	

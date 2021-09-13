@@ -8,10 +8,10 @@ public class TextArea extends KeyboardFunctions{
 	public BMS Bms;
 	public PApplet applet;
 	float x,y,w,h,bx,by,textSize = 12,spacing = 2,txoff,tyoff,lxpos,r1,r2,r3,r4,value;
-	public int last,lines,xpos,ypos,themeIndex,tabIndex,BMSIndex;
+	public int last,lines,xpos,ypos,themeIndex,arrayIndex;
 	public String [] textArea;
 	public String text = "",blankLine="",tempLine = "",label = "";
-	public boolean update,blink,visible = true,vScroll,hScroll;
+	public boolean update,blink,visible = true,vScroll,hScroll,tabBound;
 	public boolean mdown,toggle,border,bgFill,localTheme,setMouse,isNumber,box
 	,line;
 	public char currentKey;
@@ -880,7 +880,14 @@ public class TextArea extends KeyboardFunctions{
 
 	public void save() {
 
+		
+	};
+	
+	public void defaultSave() {
 
+		for(int i=0;i<textArea.length;i++) {
+			
+		}
 	};
 
 	public void set(float a) {

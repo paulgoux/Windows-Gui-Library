@@ -1,5 +1,7 @@
 package windowsGui;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,7 +10,7 @@ import processing.opengl.PShader;
 import processing.video.Capture;
 
 public class BMS{
-	public PApplet applet;
+	public static PApplet applet;
 	public int Mcount;
 	public BMScamera camera;
 	public int maxFolderSize = 100,mouseButton;
@@ -18,7 +20,8 @@ public class BMS{
 	public float r1,r2,r3,r4,number1,number2,number3,number4,tsize = 12;
 	public boolean updated,autoSave,globalDown,debug,borders,terrain3d,showGrid,showBoundaries,showCam,showShapes,
 	showWordVectors,showImgProcessors,showMenus = true,showEntities,dockUpdateE,dockUpdateB,dockUpdateI,
-	dockUpdateW,dockUpdateA,showNetworks,openWindow,Dock,bg,getSessionSaveRequest;
+	dockUpdateW,dockUpdateA,showNetworks,openWindow,Dock,bg,getSessionSaveRequest,getSessionLoadRequest,prefChecked,prefFound,prefLoaded,
+	loadDropdownUpdated,writeComplete,loadComplete;
 	public String clipBoard;
 	public String []cameras;
 	public String currentMouseObject;
@@ -34,7 +37,7 @@ public class BMS{
 	public String[] Lines;
 	public Button yes,no;
 	public Dock dock;
-	public tab resetDialogueTab,themeSettings,fontSettings,strokeSettings;
+	public tab resetDialogueTab,themeSettings,fontSettings,strokeSettings,restoreDialogueTab;
 	public float autoSaveTimeout = 30,transparency;
 
 
@@ -72,7 +75,8 @@ public class BMS{
 	public fileOutput output;
 	public Theme theme;
 	public SWindow Window;
-	DialogueBox sessionSave;
+	DialogueBox sessionSave,savePerm,sessionLoad,multiSessionLoad;
+	String []preferences;
 	//Capture Cam;
 
 	public BMS() {
@@ -80,8 +84,8 @@ public class BMS{
 	};
 
 	public BMS(PApplet applet) {
-		this.applet = applet;
-		theme = new Theme(applet);
+		BMS.applet = applet;
+		theme = new Theme(this);
 		theme.init();
 		initColors();
 		setupDock();
@@ -90,8 +94,8 @@ public class BMS{
 	};
 
 	public BMS(PApplet applet,boolean k) {
-		this.applet = applet;
-		theme = new Theme(applet);
+		BMS.applet = applet;
+		theme = new Theme(this);
 		theme.init();
 		initColors();
 		begin();
@@ -99,8 +103,8 @@ public class BMS{
 	};
 
 	public BMS(PApplet applet,boolean k,boolean k1) {
-		this.applet = applet;
-		theme = new Theme(applet);
+		BMS.applet = applet;
+		theme = new Theme(this);
 		theme.init();
 		initColors();
 		begin();
@@ -113,7 +117,7 @@ public class BMS{
 		absolutePath = "c:\\";
 		sketchPath = applet.sketchPath("");
 		dataPath = sketchPath+"\\data";
-		applet.println("Bms paths: ",absolutePath,sketchPath,dataPath);
+		PApplet.println("Bms paths: ",absolutePath,sketchPath,dataPath);
 		col = applet.color(0, 255, 73);
 		bgcol = applet.color(255);
 		bcol = applet.color(255);
@@ -131,11 +135,21 @@ public class BMS{
 		int h = 100;
 		float x = applet.width/2-w/2;
 		float y = applet.height/2-h/2;
-		sessionSave = new DialogueBox(x,y,w,h,"Dialogue 1",this);
+		sessionSave = new DialogueBox(x,y,w,h,"Save Preferences?",this);
 		Button b1 = new Button(10,sessionSave.h-60,w/2-20,30,"Yes",this);
 		Button b2 = new Button(20+b1.w+10,sessionSave.h-60,w/2-20,30,"No",this);
 		sessionSave.add(b1);
 		sessionSave.add(b2);
+		sessionLoad = new DialogueBox(x,y,w,h,"Save Preferences?",this);
+		sessionLoad.add(b1);
+		sessionLoad.add(b2);
+		multiSessionLoad = new DialogueBox(x,y,w,h,"Choose file",this);
+		String []s = {"1"};
+		Dropdown d1 = new Dropdown(20,10,100,20,0,"Select",s,this);
+		multiSessionLoad.add(d1);
+//		savePerm = new DialogueBox(x,y,w,h,"Restore on load?",this);
+//		savePerm.add(b1);
+//		savePerm.add(b2);
 	}
 
 	public void addWindow(int a,int b,int c,int d) {
@@ -183,13 +197,13 @@ public class BMS{
 	};
 
 	public void setupTabs() {
-		if(debug)applet.println("bms setupt 00");
+		if(debug)PApplet.println("bms setupt 00");
 		themeSettings = new tab(0,55,200,400,"Theme",this);
 		String [] s1 = {"red","green","blue","trans"};
 		float [] v1 = {52, 235, 225,50};
 		SliderBox sl2 = new SliderBox(50,40,90,90,10,s1,v1,this);
 
-		if(debug)applet.println("bms setupm 02");
+		if(debug)PApplet.println("bms setupm 02");
 		sl2.menu.draggable = false;
 		sl2.tooltip = null;
 		sl2.setPieSquare();
@@ -198,10 +212,10 @@ public class BMS{
 		themeSettings.setvScroll();
 		themeSettings.draggable = true;
 		themeSettings.add(sl2);
-		if(debug)applet.println("bms setupm 03");
+		if(debug)PApplet.println("bms setupm 03");
 		dock.add(themeSettings);
 		add(themeSettings);
-		if(debug)applet.println("bms setupm 04");
+		if(debug)PApplet.println("bms setupm 04");
 		fontSettings = new tab(themeSettings.x+themeSettings.w+20,55,200,400,"Fonts",this);
 		String [] s2 = {"red","green","blue",};
 		float [] v2 = {52, 235, 225};
@@ -270,12 +284,12 @@ public class BMS{
 	};
 
 	public void setupMenus(){
-		if(debug)applet.println("bms setupm 00");
-		String [] flabels = {"Settings","Fonts","Camera","Window","Save","Reset"};
+		if(debug)PApplet.println("bms setupm 00");
+		String [] flabels = {"Settings","Fonts","Camera","Window","Save","Load","Reset"};
 		file = new Menu(20,0,50,40,"File",flabels,this);
 
 		menus.add(file);
-		if(debug)applet.println("bms setupm 00");
+		if(debug)PApplet.println("bms setupm 00");
 
 		//----------------------file -----------------------------------
 		if(file!=null){
@@ -283,7 +297,7 @@ public class BMS{
 			file.items.get(0).submenu  = new Menu(file.items.get(0).x+file.items.get(0).w,file.items.get(0).y,70,glabels,this);
 			file.setLink(0);
 		}
-		if(debug)applet.println("bms setupm 00");
+		if(debug)PApplet.println("bms setupm 00");
 	};
 
 
@@ -360,7 +374,7 @@ public class BMS{
 
 	public void run(){
 		getSessionSaveRequest();
-		if(getSessionSaveRequest) {
+		if(getSessionSaveRequest||prefFound) {
 			toggle(0,0,themeSettings,"toggle");
 			if(toggle(0,3)) {
 				fmenu.toggle = true;
@@ -369,7 +383,8 @@ public class BMS{
 
 			if(camera!=null&&camera.settings!=null)toggle(0,1,camera.settings,"toggle");
 			themeFunctions();
-			if(bg)applet.background(theme.bgcol);
+			//if(bg)
+				applet.background(theme.bgcol);
 			globalLogic();
 			drawButtons();
 			mainFunctions();
@@ -393,11 +408,25 @@ public class BMS{
 			drawMenus();
 			drawWindows();
 			dock.drawItems();
+			if(toggle(0,4)) {
+//				output.se
+				writeComplete = false;
+				output.overWrite = true;
+				output.append = false;
+				output.setSketchLocation("\\data\\preferences0.txt");
+				
+				save();
+			}
+			if(toggle(0,5)) {
+//				output.se
+				loadComplete = false;
+				
+				load();
+			}
 		}
 	};
 
 	public void runDock(){
-
 		themeFunctions();
 		if(bg)applet.background(theme.bgcol);
 		globalLogic();
@@ -426,7 +455,67 @@ public class BMS{
 	};
 
 	public void getSessionSaveRequest(){
-		if(!getSessionSaveRequest) {
+		if(!prefChecked) {
+			File.listFiles(sketchPath+"data\\");
+			prefChecked = true;
+		}else if(File.textFiles.size()>0){
+			if(File.textFiles.size()==1) {
+				prefFound = true;
+			
+			if(!prefLoaded) {
+				String[] prefs = applet.loadStrings(sketchPath+"data\\"+File.textFiles.get(0));
+				if(prefs[0].contains("autoLoad")) {
+					getSessionLoadRequest = true;
+//					getSessionSaveRequest = true;
+				}
+				prefLoaded = true;
+				PApplet.println("bms display 01",prefLoaded);
+			}
+			}else if(File.textFiles.size()>1) {
+				
+//				if(!loadDropdownUpdated) {
+//					multiSessionLoad.main.dmenus.get(0).items.get(0).label = "First";
+//					multiSessionLoad.main.dmenus.get(1).items.get(1).label = "Last";
+//					for(int i=0;i<File.textFiles.size();i++) {
+//						String s = File.textFiles.get(i);
+//						Dropdown d = multiSessionLoad.main.dmenus.get(0);
+//						Button b = new Button(d.x,d.y+d.items.get(0).h*i+d.items.get(0).h*2,d.w,d.items.get(0).h,s,this);
+//						d.items.add(b);
+//					}
+//					loadDropdownUpdated = true;
+//				}else {
+//					multiSessionLoad.draw();
+//				}
+//				for(int i=0;i<File.textFiles.size();i++) {
+//					String s = File.textFiles.get(i);
+//					String fileName = s.substring(0, s.indexOf("preferences"));
+//					String sid = s.replace(fileName, "");
+//					int id = -1;
+//					try {
+//						applet.println("menu id",sid);
+//						id = Integer.valueOf(sid);
+//					}catch(NumberFormatException e) {
+//
+////			          break;
+//			        }
+//					
+//				}
+			}
+			
+			
+		}
+		
+		if(prefFound&&!getSessionLoadRequest) {
+			sessionLoad.draw();
+			if(sessionSave.main.toggle(0,this,"getSessionLoadRequest")) {
+				save();
+				
+			}
+			sessionSave.main.toggle(1,this,"getSessionSaveRequest");
+		}
+		
+		
+		if(!prefFound&&!getSessionSaveRequest) {
 			sessionSave.draw();
 			if(sessionSave.main.toggle(0,this,"getSessionSaveRequest")) {
 				save();
@@ -437,7 +526,9 @@ public class BMS{
 	};
 
 	public void run(int i){
-		if(getSessionSaveRequest) {
+		if(prefLoaded)PApplet.println("bms prefloaded");
+		//else 
+		if(getSessionSaveRequest||prefLoaded) {
 			toggle(0,0,themeSettings,"toggle");
 			toggle(0,1,themeSettings,"toggle");
 			toggle(0,2,fmenu,"open");
@@ -487,6 +578,13 @@ public class BMS{
 				camera.display();
 				camera.camLogic();
 			}
+			if(toggle(0,4)) {
+				writeComplete = false;
+				output.overWrite = true;
+				output.append = false;
+				output.setSketchLocation("\\data\\preferences0.txt");
+				save();
+			}
 			//			  else if(camera!=null&&camera.cam.isFlashEnabled())camera.cam.disableFlash();
 
 			if(showMenus)drawMenus();
@@ -504,7 +602,7 @@ public class BMS{
 
 	public void runEmpty(int i){
 		mouseButton = i;
-
+		PApplet.println("bms display 01");
 		globalLogic();
 		drawButtons();
 		//		mainFunctions();
@@ -621,17 +719,18 @@ public class BMS{
 
 	public void themeFunctions() {
 		if(themeSettings!=null) {
-			themeSettings.setvScroll(0, 200);
+			themeSettings.setvScroll(0, 20);
 			Menu m1 = themeSettings.sliderBoxes.get(0).menu;
 			Slider r = m1.sliders.get(0);
 			Slider g = m1.sliders.get(1);
 			Slider b = m1.sliders.get(2);
 			Slider a = m1.sliders.get(3);
-			if(r.mdown ||g.mdown||b.mdown
-					||a.mdown)  {
+//			if(r.mdown)applet.println("slider test",r.label,theme.bgcol);
+//			if(r.mdown ||g.mdown||b.mdown)  {
 				theme.bgcol = applet.color(r.value,g.value,b.value);
-				theme.setAllTransparency(a.value);
-			}
+//			}
+			if(a.mdown)theme.setAllTransparency(a.value);
+			
 		};
 
 		if(fontSettings!=null) {
@@ -651,7 +750,7 @@ public class BMS{
 			//			  s.set(0,20);
 
 			if(r.mdown ||g.mdown||b.mdown)setStrokeColor( r.value,g.value,b.value);
-			if(s.mdown)setStrokeSize(applet.max(0,s.value));
+			if(s.mdown)setStrokeSize(PApplet.max(0,s.value));
 		}
 	};
 
@@ -666,7 +765,7 @@ public class BMS{
 	public void drawTabs(){
 		for(int i=0;i<tabs.size();i++){
 			tab t = tabs.get(i);
-
+			t.tabIndex = i;
 			t.displayTab();
 		};
 	};
@@ -770,28 +869,241 @@ public class BMS{
 	};
 
 	public void load(){
-
+		fileInput input = File;
+//		input.setSketchLocation("data\\preferences.txt");
+		preferences = input.loadSketchFile("data\\preferences.txt");
+//		Strings file = applet.loadStrings(Location)
+		PApplet.println("load document frameCount", applet.frameCount);
+		if(preferences!=null) {
+//			for(int i=0;i<10;i++) {
+//				applet.println(preferences[i]);
+//			}
+			loadThemes();
+			loadMenu();
+			loadTabs();
+	//		saveButtons();
+	//		saveText();
+			loadSliderBox();
+			loadDMenus();
+			loadDock();
+		}
+//		saveWindow();
+		
 	};
+	
+	public void loadMenu() {
+		for(int i=0;i<preferences.length;i++) {
+			String s = preferences[i];
+			if(s.contains("_Menu")) {
+				String s1 = preferences[i+1];
+				String s2 = s1.substring(0, s1.indexOf(","));
+				String sid = s1.replace(s2, "");
+				int id = -1;
+				
+				//theme id
+				String menuString = preferences[i+1];
+				String menus2 = s1.substring(0, s1.indexOf(","));
+				String menusid = s1.replace(menus2, "");
+				int menuid = -1;
+				//bms menu index
+				try {
+					PApplet.println("menu id",sid);
+					id = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+
+//		          break;
+		        }
+				//bms theme id
+				try {
+					PApplet.println("theme id",menusid);
+					menuid = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+
+//		          break;
+		        }
+			
+				Menu m = menus.get(id);
+				m.x = 0;
+				m.y = 0;
+				menu.theme = themes.get(m.themeIndex);
+				
+			}
+		}
+	};
+	
+	public void loadTabs() {
+		
+	};
+	
+	public void loadSliderBox() {
+		
+	};
+	
+	public void loadDMenus() {
+		
+	};
+	
+	public void loadThemes() {
+//		Field[] fields = Theme.class.getDeclaredFields();
+//		for (Field field : fields) {
+//		  Type type1 = field.getGenericType();
+//		  System.out.println("field name: " + field.getName());
+//		  if (type1 instanceof ParameterizedType) {
+//		    ParameterizedType ptype = (ParameterizedType) type1;
+//		    ptype.getRawType();
+//		    System.out.println("-raw type:" + ptype.getRawType());
+//		    System.out.println("-type arg: " + ptype.getActualTypeArguments()[0]);
+//		  } else {
+//			  Class s = field.getType();
+//		    System.out.println("-field type: " + field.getType());
+//		  }
+//		}
+		for(int i=0;i<preferences.length;i++) {
+			String s = preferences[i];
+			
+			int last = 0;
+			if(s.contains("------------------------------------------------")) {
+				String s1 = preferences[i+1];
+//				PApplet.println("theme value",s1);
+				String sid = s1.substring(0, s1.indexOf(",")+1);
+				sid = s1.replace(sid, "");
+//				PApplet.println("theme sid",sid);
+				int id = -1;
+				try {
+			          id = (Integer.valueOf(sid));
+			          //println("num++", a);
+//			          PApplet.println("theme id",id);
+			        }
+			        catch(NumberFormatException e) {
+//			        	PApplet.println("theme id fail");
+			        }
+				if(id>-1) {
+					for(int j=i+2;j<preferences.length;j++) {
+						String s2 = preferences[j];
+						if(s2.contains(",")) {
+						String key = s2.substring(0, s2.indexOf(","));
+						String value = s2.replace(key, "");
+						value = value.replace(",", "");
+//						PApplet.println("theme key:",key,"theme value:",value);
+						Field field = null;
+						Theme t = themes.get(id);
+						try{
+							field = t.getClass().getField(key); 
+//							PApplet.println("key:",key,"value:",value);
+							String type = field.getClass().getSimpleName();
+//							type = type.replace("public" , "");
+//							type = type.replace("Field" , "");
+//							field.set(t, value); 
+							if(field.getType().getName()=="boolean"){
+								if(value.contains("true"))
+									try {
+										field.setBoolean(t, true);
+//										PApplet.println("key",key+", type: bool -->>true");
+									} catch (IllegalArgumentException | IllegalAccessException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								if(value.contains("false"))
+									try {
+										field.setBoolean(t, true);
+//										PApplet.println("key",key+", type: bool -->>false");
+									} catch (IllegalArgumentException | IllegalAccessException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+//								PApplet.println("key",key+", type: bool");
+							}
+							if(field.getType().getName()=="int"){
+								
+								try {
+							          int ik = (Integer.valueOf(value));
+							          //println("num++", a);
+							          try {
+										field.set(t, ik);
+//										PApplet.println("key",key+", type: int -->>", ik);
+									} catch (IllegalArgumentException | IllegalAccessException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+							        }
+							        catch(NumberFormatException e) {
+							        	PApplet.println("theme int fail");
+							        }
+							}
+							if(field.getType().getName().contains("String")){
+								
+								try {
+									field.set(t, value);
+									t.setFonts();
+//									PApplet.println("key",key+", type: String -->> fontName");
+								} catch (IllegalArgumentException | IllegalAccessException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							if(field.getType().getName()=="float"){
+								try {
+							          float ik = (Float.valueOf(value));
+							          //println("num++", a);
+							          try {
+										field.set(t, ik);
+//										PApplet.println("key",key+", type: float -->>", ik);
+									} catch (IllegalArgumentException | IllegalAccessException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}}
+							        catch(NumberFormatException e) {
+							        	PApplet.println("theme float fail");
+							        }
+								
+							}
+						}catch (NullPointerException e) {
+						}catch (NoSuchFieldException e) {
+						}
+//						catch (IllegalAccessException e) {
+//						}
+						
+//						if(s2.contains("------------------------------------------------")) {
+//							i = j;
+//							break;
+//						}
+						
+						
+						}
+					}
+				}
+				
+				
+				
+				
+			}
+		}
+	};
+	
+	public void loadDock() {
+		
+	}
 	
 	public void saveWindow(){
 
 		for(int i=0;i<sliderBoxes.size();i++){
 			SliderBox s = sliderBoxes.get(i);
 
-			s.save();
+			s.defaultSave();
 		}
 	};
 	
 	public void saveDock(){
 
-		for(int i=0;i<sliderBoxes.size();i++){
-			SliderBox s = sliderBoxes.get(i);
-
-			s.save();
-		}
+//		for(int i=0;i<docks.size();i++){
+//			Dock s = sliderBoxes.get(i);
+//
+//			s.save();
+//		}
+		dock.save();
 	};
 	
-	public void savedWindows(){
+	public void saveWindows(){
 
 		for(int i=0;i<sliderBoxes.size();i++){
 			SliderBox s = sliderBoxes.get(i);
@@ -802,10 +1114,10 @@ public class BMS{
 	
 	public void savedMenus(){
 
-		for(int i=0;i<sliderBoxes.size();i++){
-			SliderBox s = sliderBoxes.get(i);
-
-			s.save();
+		for(int i=0;i<dmenus.size();i++){
+			Dropdown d = dmenus.get(i);
+			d.arrayIndex = i;
+			d.defaultSave();
 		}
 	};
 
@@ -813,8 +1125,17 @@ public class BMS{
 
 		for(int i=0;i<textAreas.size();i++){
 			TextArea t = textAreas.get(i);
+			t.arrayIndex = i;
+			t.defaultSave();
+		}
+	};
+	
+	public void saveSliders(){
 
-			t.save();
+		for(int i=0;i<sliders.size();i++){
+			Slider s = sliders.get(i);
+			s.arrayIndex = i;
+			s.defaultSave();
 		}
 	};
 
@@ -822,8 +1143,9 @@ public class BMS{
 
 		for(int i=0;i<sliderBoxes.size();i++){
 			SliderBox s = sliderBoxes.get(i);
-
-			s.save();
+			s.BMSbound = true;
+			s.arrayIndex = i;
+			s.defaultSave();
 		}
 	};
 
@@ -831,8 +1153,8 @@ public class BMS{
 
 		for(int i=0;i<buttons.size();i++){
 			Button b = buttons.get(i);
-
-			b.save();
+			b.arrayIndex = i;
+			b.defaultSave();
 		}
 	};
 
@@ -840,14 +1162,8 @@ public class BMS{
 
 		for(int i=0;i<menus.size();i++){
 			Menu m = menus.get(i);
-
+			m.arrayIndex = i;
 			m.save();
-		}
-
-		for(int i=0;i<textAreas.size();i++){
-			TextArea t = textAreas.get(i);
-
-			t.save();
 		}
 	};
 
@@ -855,32 +1171,42 @@ public class BMS{
 
 		for(int i=0;i<tabs.size();i++){
 			tab t = tabs.get(i);
-
-			t.save();
+			t.BMSbound = true;
+			t.arrayIndex = i;
+			t.defaultSave();
 		}
+	};
+	
+	public void saveThemes(){
 
-		for(int i=0;i<tabs.size();i++){
-			tab t = tabs.get(i);
-
+		for(int i=0;i<themes.size();i++){
+			Theme t = themes.get(i);
+			t.index = i;
 			t.save();
 		}
 	};
 
 	public void save(){
-		output.setLocation("\\preferences.txt");
+		output.setSketchLocation("data\\preferences.txt");
+		output.overWrite = true;
 		output.checkLocation();
 		output.writeFile = true;
-		saveMenu();
-		saveTabs();
-		saveButtons();
-		saveText();
-		saveSliderBox();
-		savedMenus();
-		saveDock();
-		saveWindow();
-		theme.Bms = this;
-//		theme.save();
+		PApplet.println("frameCount", applet.frameCount);
+		output.writeLine("autoLoad");
+		if(!writeComplete) {
+			saveMenu();
+			saveTabs();
+	//		saveButtons();
+	//		saveText();
+			saveSliderBox();
+			savedMenus();
+			saveDock();
+	//		saveWindow();
+			saveThemes();
+			writeComplete = true;
+		}
 	};
+	
 
 	public void start(Object o,boolean localVar){
 		Field field = null;
@@ -1606,7 +1932,7 @@ public class BMS{
 		String []n = new String [swindows.size()];
 
 		for(int i=0;i<swindows.size();i++) {
-			n[i] = applet.str(i);
+			n[i] = PApplet.str(i);
 		}
 		return n;
 	};
@@ -1624,6 +1950,41 @@ public class BMS{
 		cameras = s;
 	};
 	
+	public static class FieldSpy<T> {
+	    public boolean[][] b = {{ false, false }, { true, true } };
+	    public String name  = "Alice";
+	    public ArrayList<Integer> list = new ArrayList<Integer>();
+	    public T val;
+
+	    public static  void getType(String... args) {
+			try {
+			    Class<?> c = Class.forName(args[0]);
+			    Field f = c.getField(args[1]);
+			    PApplet.println("Type: %s%n", f.getType());
+			    PApplet.println("GenericType: %s%n", f.getGenericType());
 	
+		        // production code should handle these exceptions more gracefully
+			} catch (ClassNotFoundException x) {
+			    x.printStackTrace();
+			} catch (NoSuchFieldException x) {
+			    x.printStackTrace();
+			}
+	    };
+	    
+	    public static void getType(String s) {
+			try {
+//			    Class<?> c = Class.forName(args[0]);
+			    Field f = Theme.class.getField(s);
+			    PApplet.println("Type: %s%n", f.getType());
+			    Object gType = f.getGenericType();
+			    PApplet.println("GenericType: %s%n", f.getGenericType());
+			    if(f.getType().equals(Boolean.TYPE)){System.out.println("true");}
+			    f.getClass().getSimpleName();
+		        // production code should handle these exceptions more gracefully
+			} catch (NoSuchFieldException x) {
+			    x.printStackTrace();
+			}
+	    };
+	}
 
 };

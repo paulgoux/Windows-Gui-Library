@@ -10,15 +10,16 @@ public class tab extends tabBoundary {
 	public PApplet applet;
 	public PGraphics canvas,canvas2;
 	public  float x, y, w, h,bx,by,bh,bw,r1,r2,r3,r4,transparency,txoff,tyoff,bbx,bby;
-	public int tabIndex = -1, current,id,Width,Height,lastState,themeIndex,canvasIndex;
-	public int state,BMSIndex;
+	public int tabIndex = -1, current,id,Width,Height,lastState,themeIndex,canvasIndex,dockIndex,arrayIndex;
+	public int state;
 	public String label,itemLabel;
 	public boolean border,open,parentCanvas,overflow,docking,docked,dmdown,show;
-	public boolean localTheme,resizable,vscroll,hscroll,tdown;
+	public boolean localTheme,resizable,vscroll,hscroll,tdown,BMSbound;
 	public PVector mouse,mouse2;
 	public Dock parentDock; 
 	public Slider parentSlider;
 	public int titleCounter;
+	String alignment;
 
 	public ArrayList<Window> windows = new ArrayList<Window>();
 	public ArrayList<Button> buttons = new ArrayList<Button>();
@@ -59,6 +60,7 @@ public class tab extends tabBoundary {
 	public boolean sliderset, displayChild, init, setTab,slidersUpdated;
 	public Button title;
 	public Theme theme,newTheme;
+	
 	public tab( float x, float y, float w, float h,int k,BMS bms) {
 
 		this.x = x;
@@ -352,25 +354,125 @@ public class tab extends tabBoundary {
 	};
 
 	public void save(){
+		applet.println("save tab",title.label);
+		fileOutput output = Bms.output;
+		output.setSketchLocation("data\\preferences.txt");
+		output.checkLocation();
+		output.writeFile = true;
+		saveMenu();
+		saveTabs();
+		saveSliderBox();
+		savedMenus();
+	};
+	
+	public void defaultSave(){
+		if(title!=null)applet.println("save tab",title.label);
+		else applet.println("save tab no title");
+		Bms.output.writeLine("");
+		Bms.output.writeLine("Tab",title.label);
+		if(BMSbound) {
+			Bms.output.writeLine("BMSbound",BMSbound);
+			Bms.output.writeLine(arrayIndex);
+		}
+		saveMenu();
+		saveTabs();
+//		saveSliderBox();
+		savedMenus();
+	};
+	
+	public void saveWindow(){
 
+		for(int i=0;i<sliderBoxes.size();i++){
+			SliderBox s = sliderBoxes.get(i);
+
+			s.save();
+		}
+	};
+	
+	public void saveDock(){
+
+		for(int i=0;i<sliderBoxes.size();i++){
+			SliderBox s = sliderBoxes.get(i);
+
+			s.save();
+		}
+	};
+	
+	public void saveWindows(){
+
+		for(int i=0;i<sliderBoxes.size();i++){
+			SliderBox s = sliderBoxes.get(i);
+
+			s.save();
+		}
+	};
+	
+	public void savedMenus(){
+
+		for(int i=0;i<sliderBoxes.size();i++){
+			SliderBox s = sliderBoxes.get(i);
+
+			s.defaultSave();
+		}
+	};
+
+	public void saveText(){
+
+		for(int i=0;i<textareas.size();i++){
+			TextArea t = textareas.get(i);
+
+//			t.defaultSave();
+		}
+	};
+
+	public void saveSliderBox(){
+
+		for(int i=0;i<sliderBoxes.size();i++){
+			SliderBox s = sliderBoxes.get(i);
+			s.arrayIndex = i;
+			s.defaultSave();
+		}
+	};
+
+	public void saveButtons(){
+
+		for(int i=0;i<buttons.size();i++){
+			Button b = buttons.get(i);
+			b.arrayIndex = i;
+			b.save();
+		}
+	};
+
+	public void saveMenu(){
+
+		for(int i=0;i<menus.size();i++){
+			Menu m = menus.get(i);
+			m.arrayIndex = i;
+			m.defaultSave();
+		}
+	};
+
+	public void saveTabs(){
+
+		for(int i=0;i<tabs.size();i++){
+			tab t = tabs.get(i);
+			t.arrayIndex = i;
+			t.save();
+		}
+	};
+	
+	public void saveThemes(){
+
+		for(int i=0;i<Bms.themes.size();i++){
+			Theme t = Bms.themes.get(i);
+
+			t.save();
+		}
 	};
 
 	public void load(){
 
 	};
-
-	void setThemeRadius() {
-		r1 = theme.r1;
-		r2 = theme.r2;
-		r3 = theme.r3;
-		r4 = theme.r4;
-
-		if(title!=null) {
-			r1 = 0;
-			r2 = 0;
-		}
-	};
-
 
 	public void disptab(PGraphics scene) {
 
@@ -383,7 +485,7 @@ public class tab extends tabBoundary {
 			t.canvas.beginDraw();
 			t.canvas.background(0,0);
 			t.canvas.pushStyle();
-			t.canvas.textFont(theme.tabfont);
+			t.canvas.textFont(theme.tabFont);
 			t.drawDragBox();
 			t.drawBorder();
 			t.boundingBox();
@@ -471,7 +573,7 @@ public class tab extends tabBoundary {
 
 			t.canvas.beginDraw();
 			t.canvas.pushStyle();
-			t.canvas.textFont(theme.tabfont);
+			t.canvas.textFont(theme.tabFont);
 			t.canvas.background(theme.tabfillcol,0);
 			//			t.drawDragBox();
 			//			t.drawBorder();
@@ -1032,7 +1134,7 @@ public class tab extends tabBoundary {
 				s = states.get(state).sliderBoxes.get(i);
 
 				if(scrollable&&hscroll&&sliderh!=null)s.x = s.bx - sliderh.value;
-				if(scrollable&&vscroll&&sliderv!=null&&sliderv.mdown) {
+				if(scrollable&&vscroll&&sliderv!=null) {
 					a = s.menu.by - sliderv.value;
 					s.setPos(s.x, a);
 					s.menu.y = a;
@@ -1638,188 +1740,225 @@ public class tab extends tabBoundary {
 		}
 	};
 
-
+	
 	public void setRadius(float a){
-		newTheme = new Theme(applet);
+		if(newTheme==null)newTheme = new Theme(Bms);
+		
+		newTheme.tabr1 = a;
+		newTheme.tabr2 = a;
+		newTheme.tabr3 = a;
+		newTheme.tabr4 = a;
+		
 		theme = newTheme;
-		theme.tabr1 = a;
-		theme.tabr2 = a;
-		theme.tabr3 = a;
-		theme.tabr4 = a;
+		
+		r1 = a;
+		r2 = a;
+		r3 = a;
+		r4 = a;
 
 		if(title!=null)title.r1 = a;
 		if(title!=null)title.r2 = a;
 
 		for (int i=0; i<buttons.size(); i++) {
 			Button d = buttons.get(i);
-			d.setRadius(theme,a);
+			d.setRadius(a);
 		}
 
 		for (int i=0; i<dmenus.size(); i++) {
 			Dropdown d = dmenus.get(i);
-			d.setRadius(theme,a);
+			d.setRadius(a);
 		}
 
 		for (int i=0; i<menus.size(); i++) {
 			Menu d = menus.get(i);
-			d.setRadius(theme,a);
+			d.setRadius(a);
 		}
 
 		for (int i=0; i<sliderBoxes.size(); i++) {
 			SliderBox s = sliderBoxes.get(i);
-			s.menu.setRadius(theme,a);
+			s.menu.setRadius(a);
 		}
 
 	};
+	
+	void setThemeRadius() {
+		r1 = theme.tabr1;
+		r2 = theme.tabr2;
+		r3 = theme.tabr3;
+		r4 = theme.tabr4;
 
-	public void setRadius(Theme theme, float a){
-		newTheme = theme;
-		this.theme = theme;
-		newTheme.r1 = a;
-		newTheme.r2 = a;
-		newTheme.r3 = a;
-		newTheme.r4 = a;
-
-		if(title!=null)title.r1 = a;
-		if(title!=null)title.r2 = a;
-
-		for (int i=0; i<buttons.size(); i++) {
-			Button d = buttons.get(i);
-			d.setRadius(theme,a);
+		if(title!=null) {
+			r1 = 0;
+			r2 = 0;
 		}
+	};
+	
+	void setRadius(Theme t) {
+		
+//		theme = t;
+		r1 = t.tabr1;
+		r2 = t.tabr2;
+		r3 = t.tabr3;
+		r4 = t.tabr4;
 
-		for (int i=0; i<dmenus.size(); i++) {
-			Dropdown d = dmenus.get(i);
-			d.setRadius(theme,a);
+		if(title!=null) {
+			r1 = 0;
+			r2 = 0;
 		}
+	};
+	
+	void setThemeRadius(Theme t) {
+		
+//		theme = t;
+		r1 = theme.tabr1;
+		r2 = theme.tabr2;
+		r3 = theme.tabr3;
+		r4 = theme.tabr4;
 
-		for (int i=0; i<menus.size(); i++) {
-			Menu d = menus.get(i);
-			d.setRadius(theme,a);
+		if(title!=null) {
+			r1 = 0;
+			r2 = 0;
 		}
-
-		for (int i=0; i<sliderBoxes.size(); i++) {
-			SliderBox s = sliderBoxes.get(i);
-			s.menu.setRadius(theme,a);
-		}
-
 	};
 
 	public void setAllRadius(float a) {
-		newTheme = new Theme(applet);
+		
+		if(newTheme==null)newTheme = new Theme(Bms);
+		
 		theme = newTheme;
 		theme.tabr1 = a;
 		theme.tabr2 = a;
 		theme.tabr3 = a;
 		theme.tabr4 = a;
-
+		
+		r1 = a;
+		r2 = a;
+		r3 = a;
+		r4 = a;
+		
 		if(title!=null)title.r1 = a;
 		if(title!=null)title.r2 = a;
 
 		for (int i=0; i<states.size(); i++) {
 			tab s = states.get(i);
-			s.setRadius(theme,a);
+			s.setThemeRadius(theme);
 		}
 	};
 
 	public void setRadius(float a,float b,float c,float d){
-		newTheme = new Theme(applet);
+		
+		if(newTheme==null)newTheme = new Theme(Bms);
+		
+		newTheme.tabr1 = a;
+		newTheme.tabr2 = b;
+		newTheme.tabr3 = c;
+		newTheme.tabr4 = d;
+		
 		theme = newTheme;
-		theme.tabr1 = a;
-		theme.tabr2 = b;
-		theme.tabr3 = c;
-		theme.tabr4 = d;
+		
+		r1 = a;
+		r2 = b;
+		r3 = c;
+		r4 = d;
 
 		if(title!=null) {
-			title.setRadius(theme,a,b,c,d);
+			title.setRadius(a,b,c,d);
 		}
 
 		for (int i=0; i<buttons.size(); i++) {
 			Button k = buttons.get(i);
-			k.setRadius(theme,a,b,c,d);
+			k.setRadius(a,b,c,d);
 		}
 
 		for (int i=0; i<dmenus.size(); i++) {
 			Dropdown d1 = dmenus.get(i);
-			d1.setRadius(theme,a,b,c,d);
+			d1.setRadius(a,b,c,d);
 		}
 
 		for (int i=0; i<menus.size(); i++) {
 			Menu m = menus.get(i);
-			m.setRadius(theme,a,b,c,d);
+			m.setRadius(a,b,c,d);
 		}
 
 		for (int i=0; i<sliderBoxes.size(); i++) {
 			SliderBox s = sliderBoxes.get(i);
-			s.menu.setRadius(theme,a,b,c,d);
+			s.menu.setRadius(a,b,c,d);
 		}
 
 	};
 
 	public void setAllRadius(float a,float b,float c,float d) {
-		newTheme = new Theme(applet);
+		if(newTheme==null)newTheme = new Theme(Bms);
+		
+		newTheme.tabr1 = a;
+		newTheme.tabr2 = b;
+		newTheme.tabr3 = c;
+		newTheme.tabr4 = d;
+		
 		theme = newTheme;
-		theme.tabr1 = a;
-		theme.tabr2 = b;
-		theme.tabr3 = c;
-		theme.tabr4 = d;
-
-		if(title!=null)title.setTitleRadius(theme,a,b);
+		
+		r1 = a;
+		r2 = b;
+		r3 = c;
+		r4 = d;
+		
+		if(title!=null)title.setTitleRadius(theme);
 
 		for (int i=0; i<states.size(); i++) {
 			tab s = states.get(i);
-			s.setRadius(theme,a,b,c,d);
+			s.setRadius(theme);
 		}
 	};
-
-	public void setRadius(Theme theme, float a,float b,float c,float d) {
-		newTheme = theme;
-		theme = newTheme;
-		theme.tabr1 = a;
-		theme.tabr2 = b;
-		theme.tabr3 = c;
-		theme.tabr4 = d;
-
-		if(title!=null)title.setTitleRadius(theme,a,b);
+	
+	public void setAllRadius(Theme t) {
+//		theme = t;
+		
+		r1 = t.tabr1;
+		r2 = t.tabr2;
+		r3 = t.tabr3;
+		r4 = t.tabr4;
+		
+		if(title!=null)title.setTitleRadius(t);
 
 		for (int i=0; i<states.size(); i++) {
 			tab s = states.get(i);
-			s.setRadius(theme,a,b,c,d);
+			s.setRadius(t);
 		}
 	};
+	
 
 	public void setTextCol(float a,float b,float c,float d){
-		newTheme = new Theme(applet);
+		if(newTheme==null)newTheme = new Theme(Bms);
+		
+		newTheme.tabtextcol = applet.color(a,b,c,d);
 		theme = newTheme;
-		theme.tabtextcol = applet.color(a,b,c,d);
 
-		if(title!=null) {
-			title.setTextCol(theme,a,b,c,d);
-		}
+		if(title!=null)title.setTextCol(a,b,c,d);
 
 		for (int i=0; i<buttons.size(); i++) {
 			Button k = buttons.get(i);
-			k.setTextCol(theme,a,b,c,d);
+			k.setTextCol(a,b,c,d);
 		}
 
-		//		for (int i=0; i<dmenus.size(); i++) {
-		//			Dropdown d1 = dmenus.get(i);
-		//			d1.setTextCol(theme,a,b,c,d);
-		//		}
-		//
-		//		for (int i=0; i<menus.size(); i++) {
-		//			Menu m = menus.get(i);
-		//			m.setTextCol(theme,a,b,c,d);
-		//		}
-		//
-		//		for (int i=0; i<sliderBoxes.size(); i++) {
-		//			SliderBox s = sliderBoxes.get(i);
-		//			s.menu.setTextCol(theme,a,b,c,d);
-		//		}
+		for (int i=0; i<dmenus.size(); i++) {
+			Dropdown d1 = dmenus.get(i);
+			d1.setTextCol(a,b,c,d);
+		}
+
+		for (int i=0; i<menus.size(); i++) {
+			Menu m = menus.get(i);
+			m.setTextCol(a,b,c,d);
+		}
+
+		for (int i=0; i<sliderBoxes.size(); i++) {
+			SliderBox s = sliderBoxes.get(i);
+			s.menu.setTextCol(a,b,c,d);
+		}
 
 	};
 
 	public void setAllAllignment(float a,float b,float c,float d) {
+		if(newTheme==null)newTheme = new Theme(Bms);
 		r1 = a;
 		r2 = b;
 		r3 = c;
@@ -1835,7 +1974,10 @@ public class tab extends tabBoundary {
 	};
 
 	public void setAlignment(String s){
-
+		if(newTheme==null)newTheme = new Theme(Bms);
+		newTheme.tabAlignment = s;
+		theme = newTheme;
+		alignment = s;
 		if(s=="CENTER"||s=="center"||s=="Center"){
 			if(title!=null){
 				title.txoff = (title.w-applet.textWidth(title.label))/2;
@@ -2318,7 +2460,10 @@ public class tab extends tabBoundary {
 	};
 
 	public void setAllBorder(boolean k) {
-		border = true;
+		if(newTheme==null)newTheme = new Theme(Bms);
+		newTheme.tabborder = k;
+		theme = newTheme;
+		border = k;
 		for(int i=0;i<buttons.size();i++) {
 			Button b = buttons.get(i);
 			b.border = true;
@@ -2346,11 +2491,16 @@ public class tab extends tabBoundary {
 	};
 
 	public void setTransparency(float a) {
+		if(newTheme==null)newTheme = new Theme(Bms);
+		newTheme.tabtransparency = a;
+		theme = newTheme;
 		transparency = a;
 	};
 
-
 	public void setAllTransparency(float a) {
+		if(newTheme==null)newTheme = new Theme(Bms);
+		newTheme.tabtransparency = a;
+		theme = newTheme;
 		transparency = a;
 		for(int i=0;i<buttons.size();i++) {
 			Button b = buttons.get(i);

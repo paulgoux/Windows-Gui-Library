@@ -755,8 +755,8 @@ public class fileOutput {
 
 	public void setLocation(String s) {
 		//absolutePath = "C:\\Users\\paul goux\\Documents";
-		absolutePath = applet.sketchPath("");
-		location = s;
+		absolutePath = "c:\\";
+		location = absolutePath+"\\"+s;
 		String s1 = "";
 		if(s.contains("\\"))s1 = s.substring(0, s.lastIndexOf("\\"));
 		folderPath = s1;
@@ -764,6 +764,23 @@ public class fileOutput {
 		fileName = s.replace(folderPath+"\\", "");
 		getExt(fileName);
 		PApplet.println("Fname", folderPath);
+		PApplet.println("fileName", fileName);
+		PApplet.println("counter", counter);
+		PApplet.println("ext", ext);
+//		checkLocation();
+//		init();
+	};
+	
+	public void setSketchLocation(String s) {
+		absolutePath = applet.sketchPath();
+		location = absolutePath+"\\"+s;
+		String s1 = "";
+		if(s.contains("\\"))s1 = s.substring(0, s.lastIndexOf("\\"));
+		folderPath = s1;
+		if(folderPath==null)folderPath = "";
+		fileName = s.replace(folderPath+"\\", "");
+		getExt(fileName);
+		PApplet.println("Fname sketch", folderPath);
 		PApplet.println("fileName", fileName);
 		PApplet.println("counter", counter);
 		PApplet.println("ext", ext);

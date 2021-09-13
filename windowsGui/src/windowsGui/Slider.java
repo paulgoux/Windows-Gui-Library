@@ -13,14 +13,14 @@ public class Slider{
 	public BMS Bms;
 	Color c;
 	public PApplet applet;
-	public int id = -1,type,functionId,themeIndex;
+	public int id = -1,type,functionId,themeIndex,arrayIndex;
 	public float x,y,w,h,bx,by,bw,bh,valuex,valuey,btnw,btnh, value = 0,txoff,tyoff,spacing = 20,tsize = 12,ssize,
 			temp,startvalue,endvalue,start,end,r1,r2,r3,r4,radius,pieVal,transparency,tempValue;
 	public String label,parentVar,parentBool,itemLabel;
 	public boolean drag,resize,border,fill = true ,toggle,visible = true,horizontal = true,vertical,matrix,
 			classic,pie,radio,square,bar,mdown,mup,Label,right,up,down,left,tvisible = true,update = true,
 			tdown,parentCanvas,mdown1,mdown2,topen,setLimits,INT,mouseOut,
-			mouseIn,mfdown;
+			mouseIn,mfdown,tabBound;
 	public boolean localTheme;
 	public int col, col2, col3;
 	public int barcol,col4,tcol,slidercol,hovercol,toggleCol ,sliderbgcol;
@@ -31,7 +31,7 @@ public class Slider{
 	public PVector mouse;
 	public TextArea Start = null,End = null,Current = null;
 	public HashMap<String,Boolean> values = new HashMap<String,Boolean>();
-	public Theme theme;
+	public Theme theme,newTheme;
 	public Slider(float xx,float yy, float ww, float hh){
 
 		x = xx;
@@ -55,7 +55,7 @@ public class Slider{
 
 	public Slider(float xx,float yy, float ww, float hh,BMS bms) {
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 		theme = bms.theme;
 		x = xx;
 		y = yy;
@@ -80,7 +80,7 @@ public class Slider{
 
 	public Slider(float xx,float yy, float ww, float hh,BMS bms,boolean b1) {
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 		theme = bms.theme;
 		x = xx;
 		y = yy;
@@ -127,7 +127,7 @@ public class Slider{
 
 	public Slider(float xx,float yy, float ww, float hh,String Label,BMS bms) {
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 		theme = bms.theme;
 		x = xx;
 		y = yy;
@@ -252,9 +252,28 @@ public class Slider{
 			
 		}
 	};
+	
+	public void defaultSave() {
+		
+		Bms.output.writeLine("Slider");
+		if(tabBound)Bms.output.writeLine("tabBound");
+		else Bms.output.writeLine("BMSbound");
+		
+		Bms.output.writeLine("arrayIndex",arrayIndex);
+		Bms.output.writeLine("themeIndex",themeIndex);
+		Bms.output.writeLine("x",x);
+		Bms.output.writeLine("y",y);
+		Bms.output.writeLine("value",value);
+		Bms.output.writeLine("valuex",valuex);
+		if(pie)Bms.output.writeLine("pieVal",pieVal);
+		Bms.output.writeLine("start",start);
+		Bms.output.writeLine("end",end);
+		
+	};
 
 	public void logic() {
 		if(mouse==null)mouse = new PVector(applet.mouseX,applet.mouseY);
+		
 		//		if (parent==null&&((pos(mouse)||btnpos(mouse))&&!mdown))mdown = true;
 		if(tooltip!=null){
 			applet.textSize(theme.slidertextsize);
@@ -276,7 +295,7 @@ public class Slider{
 				}
 			}
 
-			if(tooltipPos()&&theme.mouseReleased&&Bms.sliderObject==null){
+			if(!mfdown&&tooltipPos()&&theme.mouseReleased&&Bms.sliderObject==null){
 				Bms.sliderObject = this;
 				tooltip.toggle = true;
 				tooltip.visible = true;
@@ -300,6 +319,7 @@ public class Slider{
 
 						//cursor(ARROW);
 					}
+			
 			if(tdown){
 				applet.textSize(theme.slidertextsize);
 				if(!vertical) {
@@ -331,7 +351,7 @@ public class Slider{
 							startvalue = (float) Double.parseDouble(t.tempLine);
 							if(pie)pieVal = valuex;
 						}catch(NumberFormatException nfe) {
-							applet.println("textbox no number");
+							PApplet.println("textbox no number");
 						}
 						//	            valuex = t.getValue();
 
@@ -360,7 +380,7 @@ public class Slider{
 							value = (float) Double.parseDouble(t1.tempLine);
 							if(pie)pieVal = valuex;
 						}catch(NumberFormatException nfe) {
-							applet.println("textbox no number");
+							PApplet.println("textbox no number");
 						}
 
 						switch(functionId){
@@ -388,7 +408,7 @@ public class Slider{
 							endvalue = (float) Double.parseDouble(t2.tempLine);
 //							if(pie)pieVal = valuex;
 						}catch(NumberFormatException nfe) {
-							applet.println("textbox no number");
+							PApplet.println("textbox no number");
 						}
 
 						switch(functionId){
@@ -431,9 +451,12 @@ public class Slider{
 
 	public void draw(){
 		applet.pushStyle();
-		applet.textFont(theme.sliderfont);
+		applet.textFont(theme.sliderFont);
 		functions();
 		logic();
+		
+		if(pie)mousePieFunctions();
+		else mouseFunctions();
 		applet.popStyle();
 	};
 
@@ -461,7 +484,7 @@ public class Slider{
 			Bms.clearObject(this);
 			tooltip.visible = true;
 			tooltip.toggle = true;
-			applet.println("clear");
+			PApplet.println("clear");
 		}
 
 		if(tooltip!=null){
@@ -533,7 +556,7 @@ public class Slider{
 							startvalue = (float) Double.parseDouble(t.tempLine);
 //							if(pie)pieVal = valuex;
 						}catch(NumberFormatException nfe) {
-							applet.println("textbox no number");
+							PApplet.println("textbox no number");
 						}
 						//	            valuex = t.getValue();
 
@@ -564,7 +587,7 @@ public class Slider{
 							endvalue = (float) Double.parseDouble(t1.tempLine);
 //							if(pie)pieVal = valuex;
 						}catch(NumberFormatException nfe) {
-							applet.println("textbox no number");
+							PApplet.println("textbox no number");
 						}
 
 						switch(functionId){
@@ -594,7 +617,7 @@ public class Slider{
 							value = (float) Double.parseDouble(t2.tempLine);
 							if(pie)pieVal = valuex;
 						}catch(NumberFormatException nfe) {
-							applet.println("textbox no number");
+							PApplet.println("textbox no number");
 						}
 
 						switch(functionId){
@@ -658,10 +681,12 @@ public class Slider{
 
 	public void draw(PGraphics canvas){
 		canvas.pushStyle();
-		canvas.textFont(theme.sliderfont);
+		canvas.textFont(theme.sliderFont);
 		functions(canvas);
 		logic(canvas);
-		mouseFunctions(mouse);
+		if(pie)mousePieFunctions(mouse);
+		else mouseFunctions(mouse);
+		
 		canvas.popStyle();
 	};
 
@@ -699,7 +724,7 @@ public class Slider{
 	public void setControl(float a){
 		value = a;
 		valuex = PApplet.map( value,startvalue,endvalue, 0+1, w-1);
-		if(pie)pieVal = PApplet.map( value,startvalue,endvalue, 0, 2*applet.PI);
+		if(pie)pieVal = PApplet.map( value,startvalue,endvalue, 0, 2*PConstants.PI);
 		Field field = null;
 		try{
 			field = Link.getClass().getField("sUpdate"); 
@@ -727,7 +752,7 @@ public class Slider{
 
 	public void setControl(){
 		valuex = PApplet.map( value,startvalue,endvalue, 0+1, w-1);
-		if(pie)pieVal = PApplet.map( value,startvalue,endvalue, 0, 2*applet.PI);
+		if(pie)pieVal = PApplet.map( value,startvalue,endvalue, 0, 2*PConstants.PI);
 		PApplet.println("slider set v",value,pieVal);
 
 	};
@@ -1170,7 +1195,7 @@ public class Slider{
 		else canvas.rect(x,y,valuex,btnh,theme.r1,theme.r2,theme.r3,theme.r4);
 		canvas.fill(theme.slidertextcol);
 //		mouseFunctions(mouse);
-		float t = applet.map(valuex,0,w,startvalue,endvalue);
+		float t = PApplet.map(valuex,0,w,startvalue,endvalue);
 //		if(mouseIn)applet.println("start",startvalue,endvalue);
 //		if(mouseIn)applet.println("set mousein 01",label,value,x);
 		if(vertical){
@@ -1195,44 +1220,93 @@ public class Slider{
 	};
 
 	public void pieSquare(){
-		float val = 0;
 		float v1 = 10;
-		boolean k = PApplet.dist(applet.mouseX,applet.mouseY,x,y)<radius;
-		applet.fill(theme.slidertextcol);
 		applet.textSize(theme.slidertextsize);
 		applet.strokeWeight(theme.sliderstrokesize/2);
 		applet.stroke(theme.sliderstrokecol,theme.slidertransparency);
+		PVector m = new PVector(applet.mouseX,applet.mouseY);
 		if(!theme.sliderborder)applet.noStroke();
-		if(!tooltipPos())
-			if(applet.mousePressed&&k&&!mdown1&&Bms.sliderObject ==null){
-				mdown1 = true;
-				Bms.sliderObject = this;
-			}
-		//if(mdown)val = applet.map(applet.mouseX,0,width,0,2*applet.PI);
-		if(mdown1)pieVal = PApplet.abs(2*PConstants.PI-(PApplet.atan2(x-applet.mouseX,y-applet.mouseY)+PConstants.PI/2));
+
+		boolean k = !tooltipPos();
+
+
+		boolean k1 = PApplet.dist(m.x,m.y,x,y)<radius;
+		boolean k3 = Bms.getObject(this);
+//		boolean k4 = 
+		if(k1&&(theme.click||applet.mousePressed)){
+			mfdown = true;
+			tdown = false;
+		}
+
+		if(k1&&theme.click&&Bms.getObject()){
+			
+			mdown = true;
+			Bms.setObject(this);
+			mfdown = true;
+			tdown = false;
+			
+		}
+		if(mdown) {
+			
+			Bms.setObject(this);
+//			applet.println("slider piesq m mdown null obj",label);
+		}
+//		if(Bms.sliderObject!=null&&mdown)applet.println("slider piesq m mdown",label,Bms.sliderObject.label);
+//		if(k3)
+		if(mdown)
+			pieVal = PApplet.abs(2*PConstants.PI-(PApplet.atan2(x-m.x,y-m.y)+PConstants.PI/2));
 		if(pieVal>2*PConstants.PI)pieVal -=PConstants.PI*2;
 
-		applet.fill(theme.sliderfillcol,theme.slidertransparency);
-		if(k)applet.fill(theme.sliderhcol,theme.slidertransparency);
-		applet.ellipseMode(PConstants.CENTER);
-		applet.ellipse( x,y,radius*2-v1,radius*2-v1);
-
-
-		applet.fill(theme.sliderfillcol,theme.slidertransparency);
-		if(k)
-			applet.fill(theme.sliderhcol,theme.slidertransparency);
-		applet.ellipse( x,y,radius*2-25,radius*2-25);
 		applet.fill(theme.slidertextcol);
+		applet.textSize(theme.slidertextsize);
+		applet.text(label,x - applet.textWidth(label)/2, y - radius);
 
-		//if(mdown1) {
-		value = PApplet.map(pieVal,0,2*PConstants.PI,startvalue,endvalue);
-		if(INT)value = (int) PApplet.map(pieVal,0,2*PConstants.PI,startvalue,endvalue);
-		//}
-		applet.text(value,x- applet.textWidth(applet.str(value))/2,y+h-40);
-		if(!applet.mousePressed){
-			mdown1 = false;
-			if(Bms.sliderObject == this)Bms.sliderObject = null;
+		applet.ellipseMode(PConstants.CENTER);
+		applet.fill(theme.sliderouterfcol,theme.slidertransparency);
+		if(k&&(mdown))applet.fill(theme.sliderouterhcol,theme.slidertransparency);
+
+		applet.ellipse( x,y,radius*2-v1,radius*2-v1);
+		applet.fill(theme.sliderarcfcol,theme.slidertransparency);
+		if(k&&(k1))applet.fill(theme.sliderarchcol,theme.slidertransparency);
+		applet.arc(x,y, radius*2, radius*2, 0, pieVal, PConstants.PIE);
+
+		applet.fill(theme.sliderinnerfcol,theme.slidertransparency);
+		if(k&&(mdown))applet.fill(theme.sliderinnerhcol);
+		if(!theme.sliderfill)applet.noFill();
+		applet.arc(x,y, radius*2-25, radius*2-25, 0, pieVal, PConstants.PIE);
+		//		if(!tooltipPos(mouse))
+		if(k3&&k&&(k1||mdown)) {
+			applet.noStroke();
+			applet.fill(theme.sliderinnerhcol,theme.slidertransparency);
+			applet.stroke(theme.sliderinnerfcol,theme.slidertransparency);
+			applet.arc(x,y, radius*2-25, radius*2-25, 0, pieVal, PConstants.PIE);
 		}
+		applet.stroke(theme.sliderstrokecol,theme.slidertransparency);
+		if(!theme.sliderborder)applet.noStroke();
+		applet.fill(theme.sliderinnerfcol,theme.slidertransparency);
+		if(k&&(k1||mdown))applet.fill(theme.sliderinnerhcol);
+		applet.ellipse( x,y,radius*2-25,radius*2-25);
+
+		applet.stroke(theme.sliderstrokecol,theme.slidertransparency);
+		if(!theme.sliderborder)applet.noStroke();
+		applet.arc(x,y, radius*2, radius*2, 0, pieVal, PConstants.PIE);
+
+		applet.fill(theme.slidertextcol);
+		applet.textSize(theme.slidertextsize);
+//		if(mdown&&Bms.sliderObject == this) {
+			value = PApplet.map(pieVal,0,2*PConstants.PI,startvalue,endvalue);
+			if(INT)value = (int) value;
+//			applet.println("slider piesq int",INT,value);
+
+//		}
+		applet.text(value,x- applet.textWidth("00000")/2,y+h-h/2+10);
+		if(!mdown&&!applet.mousePressed&&mfdown)mfdown = false;
+		if(mdown&&!applet.mousePressed){
+			mdown = false;
+			if(Bms.getObject(this))Bms.clearObject(this);
+			if(!tooltipPos())mfdown = false;
+		}
+		if(!applet.mousePressed&&!tooltipPos())mfdown = false;
 	};
 
 	public void pieSquare(PGraphics canvas){
@@ -1249,19 +1323,24 @@ public class Slider{
 		boolean k1 = PApplet.dist(mouse.x,mouse.y,x,y)<radius;
 		boolean k3 = Bms.getObject(this);
 //		boolean k4 = 
-
+		if(k1&&(theme.click||applet.mousePressed)){
+			mfdown = true;
+			tdown = false;
+		}
 		if(k1&&theme.click&&Bms.getObject()){
-//			applet.println("slider piesq m mdown ",label);
+			
 			mdown = true;
 			Bms.setObject(this);
 		}
 		if(mdown) {
-//			Bms.setObject(this);
+			tdown = false;
+			Bms.setObject(this);
 //			applet.println("slider piesq m mdown null obj",label);
 		}
 //		if(Bms.sliderObject!=null&&mdown)applet.println("slider piesq m mdown",label,Bms.sliderObject.label);
-		if(k3)
-		if(mdown)pieVal = PApplet.abs(2*PConstants.PI-(PApplet.atan2(x-mouse.x,y-mouse.y)+PConstants.PI/2));
+//		if(k3)
+		if(mdown)
+			pieVal = PApplet.abs(2*PConstants.PI-(PApplet.atan2(x-mouse.x,y-mouse.y)+PConstants.PI/2));
 		if(pieVal>2*PConstants.PI)pieVal -=PConstants.PI*2;
 
 		canvas.fill(theme.slidertextcol);
@@ -1283,6 +1362,7 @@ public class Slider{
 		canvas.arc(x,y, radius*2-25, radius*2-25, 0, pieVal, PConstants.PIE);
 		//		if(!tooltipPos(mouse))
 		if(k3&&k&&(k1||mdown)) {
+			
 			canvas.noStroke();
 			canvas.fill(theme.sliderinnerhcol,theme.slidertransparency);
 			canvas.stroke(theme.sliderinnerfcol,theme.slidertransparency);
@@ -1307,10 +1387,12 @@ public class Slider{
 
 //		}
 		canvas.text(value,x- applet.textWidth("00000")/2,y+h-h/2+10);
+		if(!mdown&&!applet.mousePressed&&mfdown)mfdown = false;
 		if(mdown&&!applet.mousePressed){
 			mdown = false;
 			if(Bms.getObject(this))Bms.clearObject(this);
 		}
+		if(!applet.mousePressed&&!tooltipPos(mouse))mfdown = false;
 	};
 
 	public void pieLogic(){
@@ -1412,6 +1494,48 @@ public class Slider{
 			Bms.clearObject(this);
 		}
 	};
+	
+	public void mousePieFunctions(){
+		
+		if(tooltip==null&&!pos()&&applet.mousePressed&&!mdown&&Bms.sliderObject==this){
+			Bms.sliderObject = null;
+			mdown = true;
+			
+//			applet.println(parentTab.x,parentTab.y,applet.mouseX,mouse.x,applet.mouseY,mouse.y);
+		}
+		if(pos()&&applet.mousePressed&&!mdown&&Bms.sliderObject==null){
+			Bms.sliderObject = this;
+			mdown = true;
+			
+			//applet.println(parentTab.x,parentTab.y,applet.mouseX,mouse.x,applet.mouseY,mouse.y);
+		}
+
+		if(mdown){
+			PVector m = new PVector(applet.mouseX,applet.mouseY);
+			if(bar){
+				if(vertical){
+					if(m.y>y&&m.y<y + h-1)valuex = m.y-y;
+					if(m.y>y+h-1)valuex = h-1;
+				}else{
+					if(m.x>x&&m.x<x + w-1)valuex = m.x-x;
+					if(m.x>x+w-1)valuex = w-1;
+				}}
+			else if(radio||square){
+				if(vertical){
+					if(m.y>y-1&&m.y<y + h-1&&m.x>x && m.x < x + w)valuex = m.y-y-1;
+					if(m.y>y+h-btnw)valuex = h-btnw;
+
+				}else{
+					if(m.x>x-1&&m.x<x + w-btnw && m.y>y && m.y < y + h)valuex = m.x-x;
+					if(m.x>x+w-btnw)valuex = w-btnw;
+				}}}
+			if(mdown&&!applet.mousePressed) {
+				if(Bms.sliderObject==this)Bms.sliderObject = null;
+				mdown = false;
+				if(!tooltipPos())mfdown = false;
+			}
+
+	};
 
 	public void mouseFunctions(PVector m){
 		
@@ -1429,6 +1553,8 @@ public class Slider{
 		}
 		if(applet.mousePressed)
 		if(mouseIn&&Bms.getObject(this)&&mfdown){
+			
+			mdown = true;
 			if(bar){
 				if(vertical){
 					if(m.y>y&&m.y<y + h-1)valuex = m.y-y;
@@ -1465,6 +1591,44 @@ public class Slider{
 				Bms.clearObject(this);
 			}
 		}
+
+	};
+	
+	public void mousePieFunctions(PVector m){
+		
+		if(tooltip==null&&!pos(mouse)&&applet.mousePressed&&!mdown&&Bms.sliderObject==this){
+			Bms.sliderObject = null;
+			mdown = true;
+//			applet.println(parentTab.x,parentTab.y,applet.mouseX,mouse.x,applet.mouseY,mouse.y);
+		}
+		if(pos(mouse)&&applet.mousePressed&&!mdown&&Bms.sliderObject==null){
+			Bms.sliderObject = this;
+			mdown = true;
+			//applet.println(parentTab.x,parentTab.y,applet.mouseX,mouse.x,applet.mouseY,mouse.y);
+		}
+
+		if(mdown){
+			if(bar){
+				if(vertical){
+					if(m.y>y&&m.y<y + h-1)valuex = m.y-y;
+					if(m.y>y+h-1)valuex = h-1;
+				}else{
+					if(m.x>x&&m.x<x + w-1)valuex = m.x-x;
+					if(m.x>x+w-1)valuex = w-1;
+				}}
+			else if(radio||square){
+				if(vertical){
+					if(m.y>y-1&&m.y<y + h-1&&m.x>x && m.x < x + w)valuex = m.y-y-1;
+					if(m.y>y+h-btnw)valuex = h-btnw;
+
+				}else{
+					if(m.x>x-1&&m.x<x + w-btnw && m.y>y && m.y < y + h)valuex = m.x-x;
+					if(m.x>x+w-btnw)valuex = w-btnw;
+				}}}
+			if(mdown&&!applet.mousePressed) {
+				if(Bms.sliderObject==this)Bms.sliderObject = null;
+				mdown = false;
+			}
 
 	};
 
@@ -1598,11 +1762,11 @@ public class Slider{
 					update = false;
 				}
 			}catch (NullPointerException e) {
-				applet.println("slider set 1 ex npe",o,s,value,"field: ", field);
+				PApplet.println("slider set 1 ex npe",o,s,value,"field: ", field);
 			}catch (NoSuchFieldException e) {
-				applet.println("slider set 1 ex nsf",o,s,value,"field: ", field);
+				PApplet.println("slider set 1 ex nsf",o,s,value,"field: ", field);
 			}catch (IllegalAccessException e) {
-				applet.println("slider set 1 ex ia");
+				PApplet.println("slider set 1 ex ia");
 			}} 
 	};
 	
@@ -1622,7 +1786,7 @@ public class Slider{
 		float v = 0;
 		if((!tdown||update)&&applet.mousePressed){
 			if(mdown1||update){
-				v = PApplet.map( pieVal, 0, 2*applet.PI,start,end);
+				v = PApplet.map( pieVal, 0, 2*PConstants.PI,start,end);
 				value = v;
 			}
 			Field field = null;
@@ -1709,7 +1873,7 @@ public class Slider{
 		float v = 0;
 		if((!tdown||update)&&applet.mousePressed){
 			if(mdown||update){
-				v = PApplet.map( pieVal, 0, 2*applet.PI,start,end);
+				v = PApplet.map( pieVal, 0, 2*PConstants.PI,start,end);
 				value = v;
 			}
 			Field field1 = null;
@@ -1768,12 +1932,12 @@ public class Slider{
 		}
 		if(!vertical){
 			if((!tdown||update)&&mdown&&Bms.getObject(this)){
-				v = PApplet.map( pieVal, 0, 2*applet.PI,start,end);
+				v = PApplet.map( pieVal, 0, 2*PConstants.PI,start,end);
 				value = v;
 				update = false;
 			}}else{
 				if((!tdown||update)&&mdown&&Bms.getObject(this)){
-					v = PApplet.map( pieVal, 0, 2*applet.PI,start,end);
+					v = PApplet.map( pieVal, 0, 2*PConstants.PI,start,end);
 					value = v;
 					update = false;
 				}}
@@ -1833,7 +1997,7 @@ public class Slider{
 
 	public void setBms(BMS bms) {
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 		theme = bms.theme;
 	};
 
@@ -1895,5 +2059,119 @@ public class Slider{
 		radio = false;
 		bar = true;
 		square = false;
+	};
+	
+	public void setTextCol(Theme t) {
+		theme = t;
+	};
+
+	public void setTextCol(Theme t, float a) {
+		
+		newTheme = t;
+		newTheme.slidertextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol(Theme t,float a,float b,float c,float d) {
+		newTheme = t;
+		newTheme.slidertextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		
+	};
+
+	public void setTextSize(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.slidertextsize = a;
+	};
+
+	public void setFillCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.sliderfillcol = applet.color(a);
+	};
+
+	public void setFillCol(Theme theme,float a,float b,float c,float d) {
+		newTheme = theme;
+		theme = newTheme;
+		theme.sliderfillcol = applet.color(a,b,c,d);
+	};
+
+	public void sethCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.sliderhcol = applet.color(a);
+	};
+
+	public void sethCol(Theme theme,float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.sliderhcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.slidertextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.slidertextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+
+	public void setTextSize( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.slidertextsize = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setFillCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.sliderfillcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setFillCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.sliderfillcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+
+	public void sethCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.sliderhcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void sethCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.sliderhcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+	
+	public void setRadius(float a) {
+		newTheme = new Theme(applet);
+		theme = newTheme;
+		theme.sliderr1 = a;
+		theme.sliderr2 = a;
+		theme.sliderr3 = a;
+		theme.sliderr4 = a;
+		r1 = a;
+		r2 = a;
+		r3 = a;
+		r4 = a;
+	};
+	
+	public void setRadius(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.slidertextcol = applet.color(a);
+		r1 = newTheme.sliderr1 = a;
+		r2 = newTheme.sliderr2 = b;
+		r3 = newTheme.sliderr3 = c;
+		r4 = newTheme.sliderr4 = d;
+		theme = newTheme;
+		
 	};
 };

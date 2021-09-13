@@ -15,7 +15,7 @@ public class Button {
 	public PApplet applet;
 	public PGraphics canvas;
 	public float x,y,bx,by,w,h,size,textsize = 12,xoff,yoff,bsize,tsize = 12,tyoff,txoff,tmax = 2,tw,th;
-	public int id,toggle2,type,counter,themeIndex,tabIndex,BMSIndex;
+	public int id,toggle2,type,counter,themeIndex;
 	public float scalew,scaleh,r1,r2,r3,r4,rx,ry,transparency;
 
 	public String label,blabel;
@@ -23,8 +23,8 @@ public class Button {
 	public boolean drag,resize, radio,update,border = true,vertical,horizontal,gif,Img,value,textright,textbtm,textleft,
 			textup,texttoggle,animate = true,toggleb,mdown,m1down,sdown,visible = true,plain = true,labelVisible = true
 			,up,right,down,classicBar,toggleBox,mdown2,textcheck,parentCanvas,subLeft,click,mclick,m2down,toggle;
-	public boolean localTheme,mdown1,mup,register,hover,dclick,set;
-	public int fcol,bcol,hcol,col,tcol,col1 = fcol,toggleCol;
+	public boolean localTheme,mdown1,mup,register,hover,dclick,set,BMSbound;
+	public int fcol,bcol,hcol,col,tcol,col1 = fcol,toggleCol,arrayIndex;
 	public Menu parent;
 	public Menu submenu;
 	public Window subwindow;
@@ -60,7 +60,7 @@ public class Button {
 
 	public Button(float xx, float yy, float ww, float hh, String Label,BMS bms){
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 		theme = Bms.theme;
 		x = xx;
 		y = yy;
@@ -92,7 +92,7 @@ public class Button {
 
 	public Button(float xx, float yy, float ww, float hh,BMS bms){
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 
 		x = xx;
 		y = yy;
@@ -148,6 +148,8 @@ public class Button {
 	public void save(){
 //		Bms.output.reset();
 		Bms.output.setLocation(Bms.dataPath+"\\preferences.txt");
+		Bms.output.writeLine("");
+		Bms.output.writeLine("button");
 		Bms.output.writeLine("themeIndex",themeIndex);
 		Bms.output.writeLine(x+",");
 		Bms.output.write(y+",");
@@ -156,9 +158,23 @@ public class Button {
 		Bms.output.write(y+",");
 		Bms.output.write(label+",");
 		Bms.output.write((submenu==null)+",");
-//		applet.println("hh");
-//		if(submenu!=null)
-
+	};
+	
+	public void defaultSave(){
+//		Bms.output.reset();
+		Bms.output.setLocation(Bms.dataPath+"\\preferences.txt");
+		Bms.output.writeLine("");
+		Bms.output.writeLine("button");
+		if(BMSbound) Bms.output.writeLine("BmsBound");
+		Bms.output.writeLine("arrayIndex",arrayIndex);
+		Bms.output.writeLine("themeIndex",themeIndex);
+		Bms.output.writeLine(x+",");
+		Bms.output.write(y+",");
+		Bms.output.write(w+",");
+		Bms.output.write(h+",");
+		Bms.output.write(y+",");
+		Bms.output.write(label+",");
+		Bms.output.write((submenu==null)+",");
 	};
 
 	public void load(){
@@ -522,10 +538,10 @@ public class Button {
 		getThemeradius();
 		highlight();
 		logic();
-		if(getParent()&&click)applet.println("btn draw parent toggle");
+//		if(getParent()&&click)PApplet.println("btn draw parent toggle");
 		applet.textSize(theme.buttontextsize);
 		applet.pushStyle();
-		applet.textFont(theme.buttonfont);
+		applet.textFont(theme.buttonFont);
 		if(plain)drawPlain();
 		if(radio)drawClassicRadio();
 		if(classicBar)drawClassicBar();
@@ -576,7 +592,7 @@ public class Button {
 		highlight(mouse);
 		canvas.textSize(theme.buttontextsize);
 		canvas.pushStyle();
-		canvas.textFont(theme.buttonfont);
+		canvas.textFont(theme.buttonFont);
 		if(plain)drawPlain(canvas);
 		else if(radio)drawClassicRadio(canvas);
 		else if(classicBar)drawClassicBar(canvas);
@@ -892,11 +908,11 @@ public class Button {
 
 					field.set(a, toggle);
 			}catch (NullPointerException e) {
-				applet.println("button toggle 1 npe");
+				PApplet.println("button toggle 1 npe");
 			}catch (NoSuchFieldException e) {
-				applet.println("button toggle 1 nsfe");
+				PApplet.println("button toggle 1 nsfe");
 			}catch (IllegalAccessException e) {
-				applet.println("button toggle 1 iae");
+				PApplet.println("button toggle 1 iae");
 			}}
 		if(!applet.mousePressed){
 			mdown = false;
@@ -1501,7 +1517,7 @@ public class Button {
 			}
 		}
 
-		applet.println("button highlights ",l);
+		PApplet.println("button highlights ",l);
 	};
 
 	public void highlight(){
@@ -1546,34 +1562,6 @@ public class Button {
 				col = theme.buttonhcol;
 			}
 		}
-	};
-
-	public void setRadio() {
-		plain = false;
-		toggleBox = false;
-		classicBar = false;
-		radio = true;
-	};
-
-	public void setToggleBox() {
-		plain = false;
-		toggleBox = true;
-		classicBar = false;
-		radio = false;
-	};
-
-	public void setclassicBar() {
-		plain = false;
-		toggleBox = false;
-		classicBar = true;
-		radio = false;
-	};
-
-	public void setPlain() {
-		plain = plain;
-		toggleBox = false;
-		classicBar = false;
-		radio = false;
 	};
 
 	public void setLabelOff() {
@@ -1659,6 +1647,12 @@ public class Button {
 		theme.buttonr3 = a;
 		theme.buttonr4 = a;
 	};
+	
+	public void setTitleRadius(Theme t) {
+//		theme = t;
+		r1 = theme.buttonr1;
+		r2 = theme.buttonr2;
+	};
 
 	public void setTitleRadius(Theme theme, float a) {
 		newTheme = theme;
@@ -1673,44 +1667,57 @@ public class Button {
 		theme.buttonr1 = a;
 		theme.buttonr2 = b;
 	};
+	
+	public void setTitleRadius(float a,float b) {
+		r1 = a;
+		r2 = b;
+	};
 
-	public void setRadius(Theme theme, float a) {
-		this.theme = theme;
-		newTheme = theme;
-		theme.buttonr1 = a;
-		theme.buttonr2 = a;
-		theme.buttonr3 = a;
-		theme.buttonr4 = a;
+	public void setRadius(Theme t, float a) {
+		this.theme = t;
+		newTheme = t;
+		r1 = theme.buttonr1 = a;
+		r2 = theme.buttonr2 = a;
+		r3 = theme.buttonr3 = a;
+		r4 = theme.buttonr4 = a;
 	};
 
 	public void setRadius(float a,float b,float c,float d) {
-		newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		r1 = newTheme.buttonr1 = a;
+		r2 = newTheme.buttonr2 = b;
+		r3 = newTheme.buttonr3 = c;
+		r4 = newTheme.buttonr4 = d;
 		theme = newTheme;
-		theme.buttonr1 = a;
-		theme.buttonr2 = b;
-		theme.buttonr3 = c;
-		theme.buttonr4 = d;
+		
 	};
 
-	public void setRadius(Theme theme, float a,float b,float c,float d) {
-		this.theme = theme;
-		newTheme = theme;
-		newTheme.buttonr1 = a;
-		newTheme.buttonr2 = b;
-		newTheme.buttonr3 = c;
-		newTheme.buttonr4 = d;
+	public void setRadius(Theme t, float a,float b,float c,float d) {
+		theme = t;
+		newTheme = t;
+		r1 = newTheme.buttonr1 = a;
+		r2 = newTheme.buttonr2 = b;
+		r3 = newTheme.buttonr3 = c;
+		r4 = newTheme.buttonr4 = d;
+	};
+	
+	public void setTextCol(Theme t) {
+		theme = t;
 	};
 
-	public void setTextCol(Theme theme, float a) {
-		this.theme = theme;
-		newTheme = theme;
-		theme.buttontextcol = applet.color(a);
-	};
-
-	public void setTextCol(Theme theme,float a,float b,float c,float d) {
-		newTheme = theme;
+	public void setTextCol(Theme t, float a) {
+		
+		newTheme = t;
+		newTheme.buttontextcol = applet.color(a);
 		theme = newTheme;
-		theme.buttontextcol = applet.color(a,b,c,d);
+	};
+
+	public void setTextCol(Theme t,float a,float b,float c,float d) {
+		newTheme = t;
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		
 	};
 
 	public void setTextSize(Theme theme, float a) {
@@ -1738,51 +1745,51 @@ public class Button {
 	};
 
 	public void sethCol(Theme theme,float a,float b,float c,float d) {
-		newTheme = theme;
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a);
 		theme = newTheme;
-		theme.buttonhcol = applet.color(a,b,c,d);
 	};
 
 	public void setTextCol( float a) {
-		newTheme = new Theme(applet);
-		this.theme = newTheme;
-		theme.buttontextcol = applet.color(a);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
 	};
 
 	public void setTextCol(float a,float b,float c,float d) {
-		newTheme = new Theme(applet);
-		this.theme = newTheme;
-		theme.buttontextcol = applet.color(a,b,c,d);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
 	};
 
 	public void setTextSize( float a) {
-		newTheme = new Theme(applet);
-		this.theme = newTheme;
-		theme.buttontextsize = a;
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextsize = applet.color(a);
+		theme = newTheme;
 	};
 
 	public void setFillCol( float a) {
-		newTheme = new Theme(applet);
-		this.theme = newTheme;
-		theme.buttonfillcol = applet.color(a);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonfillcol = applet.color(a);
+		theme = newTheme;
 	};
 
 	public void setFillCol(float a,float b,float c,float d) {
-		newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonfillcol = applet.color(a,b,c,d);
 		theme = newTheme;
-		theme.buttonfillcol = applet.color(a,b,c,d);
 	};
 
 	public void sethCol( float a) {
-		newTheme = new Theme(applet);
-		this.theme = newTheme;
-		theme.buttonhcol = applet.color(a);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a);
+		theme = newTheme;
 	};
 
 	public void sethCol(float a,float b,float c,float d) {
-		newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a,b,c,d);
 		theme = newTheme;
-		theme.buttonhcol = applet.color(a,b,c,d);
 	};
 
 	public void setClassicBar() {
@@ -1792,6 +1799,34 @@ public class Button {
 		radio = false;
 		plain = false;
 
+	};
+	
+	public void setRadio() {
+		plain = false;
+		toggleBox = false;
+		classicBar = false;
+		radio = true;
+	};
+
+	public void setToggleBox() {
+		plain = false;
+		toggleBox = true;
+		classicBar = false;
+		radio = false;
+	};
+
+	public void setclassicBar() {
+		plain = false;
+		toggleBox = false;
+		classicBar = true;
+		radio = false;
+	};
+
+	public void setPlain() {
+		plain = plain;
+		toggleBox = false;
+		classicBar = false;
+		radio = false;
 	};
 
 };

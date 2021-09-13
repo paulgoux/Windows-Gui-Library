@@ -11,9 +11,9 @@ public class fileInput{
 	BMS Bms;
 	PApplet applet;
 	public String value;
-	public String location,fileExt;
+	public String location,fileExt,fileName,folderPath,ext,absolutePath,fileContent;
 	public boolean click = false,folder,counted,fileSelect,openWindow,
-			fileOpened,folderOpened,folderSelect, showDialog,closeDialog;
+			fileOpened,folderOpened,folderSelect, showDialog,closeDialog,file;
 	public float x,y,w,h;
 	public Window window;
 	public String [] values;
@@ -24,6 +24,9 @@ public class fileInput{
 	public ArrayList<String>audioFiles = new ArrayList<String>();
 	public ArrayList<String>textFiles = new ArrayList<String>();
 	public ArrayList<String>officeDocs = new ArrayList<String>();
+	public ArrayList<String>Files = new ArrayList<String>();
+	public ArrayList<String>images = new ArrayList<String>();
+	public ArrayList<String>otherFiles = new ArrayList<String>();
 	public HashMap<String, ArrayList<Integer>> extensions = new HashMap<String, ArrayList<Integer>>();
 	public PImage img;
 	public String[] text;
@@ -156,24 +159,147 @@ public class fileInput{
 //			//					rest = true;
 //		}
 //	};
+	
+	public void setLocation(String s) {
+		location = s;
+		folderPath = s.substring(0, s.lastIndexOf("\\"));
+		fileName = s.replace(folderPath+"\\", "");
+		getExt(fileName);
+		PApplet.println("Fname", folderPath);
+		PApplet.println("fileName", fileName);
+		PApplet.println("ext", ext);
+		init();
+	};
+	
+	public void setSketchLocation(String s) {
+		location = applet.sketchPath()+"\\"+s;
+		folderPath = s.substring(0, s.lastIndexOf("\\"));
+		fileName = s.replace(folderPath+"\\", "");
+		getExt(fileName);
+		PApplet.println("Fname", folderPath);
+		PApplet.println("fileName", fileName);
+		PApplet.println("ext", ext);
+//		initSketch();
+	};
+	
+	public void init() {
+		absolutePath = "C:\\";
+	};
+	public void initSketch() {
+		absolutePath = applet.sketchPath();
+	};
+	
+	public void initSketchPath() {
+		absolutePath = applet.sketchPath();
+	};
 
-	public String getFile(){
+	public void getExt(String location) {
 
-		String s = value;
-		value = null;
+		int count = 0;
+		fileName = location.substring(0, location.indexOf("."));
+		ext = location.replace(fileName, "");
+		ext = ext.replace(".", "");
+		ext = ext.replace(fileName, "");
+	};
+
+	public String getLocation(){
+		String s = location;
+		location = null;
 		return s;
 	};
 
 	public String getFolder(){
-		String s = value;
-		value = null;
+		String s = folderPath;
+		location = null;
 		return s;
 	};
 
 	public void saveLocation(String location){
 		this.location = location;
 	};
+	
+	public String[] listFiles(String s1) {
+		String  []s = null;
+		String path = s1;
+		applet.println("Files", "Path: " + path);
+		File directory = new File(path);
+		File[] files = directory.listFiles();
+		if (files!=null) {
+			s = new String [files.length];
+			applet.println("Files", "Size: "+ files.length);
+			for (int i = 0; i < files.length; i++)
+			{
+				s[i] = files[i].getName();
+				Files.add(s[i]);
+				filterAll(s[i]);
 
+				applet.println("Files", "FileName: " + files[i].getName());
+			}
+			applet.println("Images", images.size());
+			applet.println("text", textFiles.size());
+			applet.println("Audio", audioFiles.size());
+			applet.println("Other", otherFiles.size());
+		}else applet.println("no files");
+		
+		return s;
+	};
+	
+	public void filterAll(String s) {
+		filterImage(s);
+		filterText(s);
+		filterAudio(s);
+		filterVideo(s);
+		filterOthers(s);
+	};
+	
+	public void filterImage(String s) {
+		if (s.contains("jpg")
+				||s.contains("JPG")
+				||s.contains("bmp")
+				||s.contains("BMP")
+				||s.contains("png")
+				||s.contains("PNG")
+				||s.contains("gif")
+				||s.contains("GIF")) {
+			if (!images.contains(s))images.add(s);
+		}
+	};
+
+	public void filterText(String s) {
+		if (s.contains("txt")
+				||s.contains("doc")
+				||s.contains("docx")
+				||s.contains("csv")) {
+			if (!textFiles.contains(s))textFiles.add(s);
+		}
+	};
+
+	public void filterAudio(String s) {
+		if (s.contains("ogg")
+				||s.contains("mp3")
+				||s.contains("wav")) {
+			if (!audioFiles.contains(s))audioFiles.add(s);
+		}
+	};
+
+	public void filterVideo(String s) {
+		if (s.contains("mp4")
+				||s.contains("wmv")
+				||s.contains("avi")
+				||s.contains("mkv")) {
+			if (!videoFiles.contains(s))videoFiles.add(s);
+		}
+	};
+
+	public void filterOthers(String s) {
+		if (!images.contains(s)
+				&&!textFiles.contains(s)
+				&&!videoFiles.contains(s)
+				&&!audioFiles.contains(s)) {
+			if (!otherFiles.contains(s))otherFiles.add(s);
+		}
+	};
+	
 	public void listen(){
 //		applet.fill(255);
 		window = Bms.fmenu;
@@ -184,15 +310,16 @@ public class fileInput{
 //		if(window.toggle&&!window.close)window.displayGrid();
 		if(window.getClose()||window.close){
 			window.toggle = false;
+			window.close = true;
 			location = window.currentf;
-			value = location;
-//			PApplet.println("fin Location: " + value);
+			if(location==null)location = "";
+			PApplet.println("fin Location: " + value);
 			if(location!=null) {
 				
-				if(!folder)load();
-				else if(value!=null){
-					PApplet.println("Location: " + value);
-					String []s = getFolder(value);
+				if(!folder)loadFile();
+				else {
+					PApplet.println("Location: " + location);
+					String []s = getFolder(location);
 				}
 			}
 			
@@ -220,11 +347,11 @@ public class fileInput{
 		}
 		if(openWindow&&!window.open){
 			openWindow = false;
-			value = window.currentf;
+			location = window.currentf;
 			applet.println("file input listen location m;",value);
 		}
 //		if(window!=null)window.displayGrid();
-		if(fileSelect&&value!=null)PApplet.println("Location: " + Bms.Location);
+		if(fileSelect&&location!=null)PApplet.println("Location: " + location);
 
 	};
 
@@ -249,7 +376,7 @@ public class fileInput{
 		}
 		if(openWindow&&!window.open){
 			openWindow = false;
-			value = window.link;
+			location = window.link;
 		}
 		if(window!=null)window.displayGrid();
 	};
@@ -283,8 +410,7 @@ public class fileInput{
 	};
 
 	public void getTextFiles(){
-
-
+		
 	};
 
 	public void getImageFiles(){
@@ -312,6 +438,11 @@ public class fileInput{
 		img = applet.loadImage(location);
 		applet.println("finput getimg",location,img);
 	};
+	
+	public void loadImages() {
+		
+		
+	};
 
 	public void getDocument(){
 
@@ -320,7 +451,7 @@ public class fileInput{
 
 	public void getTextFile(){
 
-
+		values = applet.loadStrings(location);
 	};
 
 	public void getVideoFile(){
@@ -328,16 +459,17 @@ public class fileInput{
 
 	};
 
-	public void load() {
+	public void loadFile() {
+		if(file)
 			if(!fileOpened) {
 				String ext = getExt();
 				if(ext!=null) {
-				if(ext.contains("jpg")||ext.contains("jpeg")||ext.contains("JPG")||ext.contains("JPEG"))getImageFile();
-				if(ext.contains("mp4")||ext.contains("mkv")||ext.contains("avi")||ext.contains("wmv"))getVideoFile();
-				if(ext.contains("mp3")||ext.contains("ogg")||ext.contains("wma"))getAudioFile();
-				if(ext.contains("txt")||ext.contains("csv"))getTextFile();
-				if(ext.contains("doc")||ext.contains("DOC")||ext.contains("DOCX")||ext.contains("docx"))getDocument();
-				applet.println("finput load",location,img);
+					if(ext.contains("jpg")||ext.contains("jpeg")||ext.contains("JPG")||ext.contains("JPEG"))getImageFile();
+					if(ext.contains("mp4")||ext.contains("mkv")||ext.contains("avi")||ext.contains("wmv"))getVideoFile();
+					if(ext.contains("mp3")||ext.contains("ogg")||ext.contains("wma"))getAudioFile();
+					if(ext.contains("txt")||ext.contains("csv"))getTextFile();
+					if(ext.contains("doc")||ext.contains("DOC")||ext.contains("DOCX")||ext.contains("docx"))getDocument();
+					applet.println("finput load",location,img);
 				}else applet.println("finput load is not a file",location);
 				fileOpened = true;
 			}
@@ -387,11 +519,43 @@ public class fileInput{
 	//		}
 	//		return s;
 	//	};
+	
+	public String []getFile() {
+		return values = applet.loadStrings(location);
+	};
+	
+	public String []loadStrings() {
+		return values = applet.loadStrings(location);
+	};
+	
+	public String []getFile(String s) {
+		setLocation(s);
+		return values = applet.loadStrings(location);
+	};
+	
+	public String []loadFile(String s) {
+		setLocation(s);
+		return values = applet.loadStrings(location);
+	};
+	
+	public String []loadSkethFile(String s) {
+		setSketchLocation(s);
+		return values = applet.loadStrings(location);
+	};
+	
+	public String []getSketchFile(String s) {
+		setSketchLocation(s);
+		return values = applet.loadStrings(location);
+	};
+	
+	public String []loadSketchFile(String s) {
+		setSketchLocation(s);
+		return values = applet.loadStrings(location);
+	};
 
 	public String []getFolder(String location) {
 
 		String []names = fileUtils.listNames(value);
-		applet.println("finput getFolder 00",names.length);
 		if(names!=null&&!counted){
 			for(int i=0;i<names.length;i++){
 
@@ -446,12 +610,12 @@ public class fileInput{
 	};
 
 	public void fileSelected(File selection){
-		if(selection != null)Bms.File.value = selection.getAbsolutePath();
+		if(selection != null)Bms.File.location = selection.getAbsolutePath();
 	};
 
 	public void folderSelected(File selection) {
 		if(selection != null){
-			Bms.File.value = selection.getAbsolutePath();
+			Bms.File.location = selection.getAbsolutePath();
 			Bms.Location = selection.getAbsolutePath();
 		}
 	};
@@ -471,10 +635,10 @@ public class fileInput{
 	public String getExt() {
 		String s = null;
 		if(location.contains(".")) {
-			fileExt = location.replace(value.substring(0, value.lastIndexOf('.')),"");
-			fileExt = fileExt.replace(".", "");
-			applet.println("finput getext",fileExt);
-			s = fileExt;
+			ext = location.replace(value.substring(0, value.lastIndexOf('.')),"");
+			ext = fileExt.replace(".", "");
+			applet.println("finput getext",ext);
+			s = ext;
 		}
 		return s;
 	};
@@ -505,7 +669,6 @@ public class fileInput{
 		fileOpened = false;
 		folderOpened = false;
 		location = null;
-		value = null;
 		tempFile = null;
 //		ext = null;
 	}

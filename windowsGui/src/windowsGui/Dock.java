@@ -223,6 +223,41 @@ public class Dock{
 		r3 = theme.r3;
 		r4 = theme.r4;
 	};
+	
+	void setThemeBorder() {
+		r1 = theme.r1;
+		r2 = theme.r2;
+		r3 = theme.r3;
+		r4 = theme.r4;
+	};
+	
+	void setThemeFill() {
+		r1 = theme.r1;
+		r2 = theme.r2;
+		r3 = theme.r3;
+		r4 = theme.r4;
+	};
+	
+	void setThemeStrokeCol() {
+		r1 = theme.r1;
+		r2 = theme.r2;
+		r3 = theme.r3;
+		r4 = theme.r4;
+	};
+	
+	void setThemeStrokeColor() {
+		r1 = theme.r1;
+		r2 = theme.r2;
+		r3 = theme.r3;
+		r4 = theme.r4;
+	};
+	
+	void setThemeFillCol() {
+		r1 = theme.r1;
+		r2 = theme.r2;
+		r3 = theme.r3;
+		r4 = theme.r4;
+	};
 
 	PVector getMouse(Button b){
 
@@ -245,7 +280,7 @@ public class Dock{
 	};
 
 	public void setRadius(float a){
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		newTheme.r1 = a;
 		newTheme.r2 = a;
@@ -256,19 +291,16 @@ public class Dock{
 		newTheme.buttonr2 = a;
 		newTheme.buttonr3 = a;
 		newTheme.buttonr4 = a;
-
-		Bms.themes.add(newTheme);
-
+		setThemeRadius();
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 
 	};
 
 	public void setRadius(float a,float b,float c,float d){
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		newTheme.r1 = a;
 		newTheme.r2 = b;
@@ -279,9 +311,9 @@ public class Dock{
 		newTheme.buttonr2 = b;
 		newTheme.buttonr3 = c;
 		newTheme.buttonr4 = d;
-
-		Bms.themes.add(newTheme);
-
+		
+		setThemeRadius();
+		
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
@@ -291,103 +323,83 @@ public class Dock{
 	};
 
 	public void setBorder(boolean k) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = k;
 		theme.buttonborder = k;
 
-		Bms.themes.add(newTheme);
-
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 	};
 
 	public void setStrokeSize(float k) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonstrokesize = k;
 
-		Bms.themes.add(newTheme);
-
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 	};
 
 	public void setStrokeCol(int k) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonstrokecol = k;
 
-		Bms.themes.add(newTheme);
-
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 	};
 
 	public void setStrokeCol(float a,float b,float c) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonstrokecol = applet.color(a,b,c);
 
-		Bms.themes.add(newTheme);
-
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 	};
 
 	public void setStrokeCol(float a,float b,float c,float d) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonstrokecol = applet.color(a,b,c,d);
 
-		Bms.themes.add(newTheme);
-
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 	};
 
 	public void setFillCol(int k) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonfillcol = k;
 
-		Bms.themes.add(newTheme);
-
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
-			b1.themeIndex = Bms.themes.size();
 		}
 	};
 
 	public void setFillCol(float a,float b,float c) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonfillcol = applet.color(a,b,c);
-
-		Bms.themes.add(newTheme);
-
+		
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
 			b1.theme = theme;
@@ -396,12 +408,10 @@ public class Dock{
 	};
 
 	public void setFillCol(float a,float b,float c,float d) {
-		if(newTheme==null) newTheme = new Theme(applet);
+		if(newTheme==null) newTheme = new Theme(Bms);
 		theme = newTheme;
 		theme.dockborder = true;
 		theme.buttonfillcol = applet.color(a,b,c,d);
-
-		Bms.themes.add(newTheme);
 
 		for(int i=0;i<buttons.size();i++){
 			Button b1 = buttons.get(i);
@@ -441,6 +451,18 @@ public class Dock{
 			names.remove(i);
 			buttons.remove(i);
 		}
+	};
+	
+	public void defaultSave() {
+		
+		for(int i=0;i<buttons.size();i++) {
+			
+		}
+	};
+	
+	public void save() {
+		
+		
 	};
 
 };

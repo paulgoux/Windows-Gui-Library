@@ -742,7 +742,7 @@ public class Window  extends MouseFunctions{
 		//	    
 		//if(!ddown&&!sliders.get(0).mdown)
 		if(X.latch(this,"close")){
-			applet.println("wnd close hh",close);
+//			applet.println("wnd close hh",close);
 		};
 
 		if(ddown){
