@@ -266,8 +266,6 @@ public class Slider{
 		Bms.output.writeLine("value",value);
 		Bms.output.writeLine("valuex",valuex);
 		if(pie)Bms.output.writeLine("pieVal",pieVal);
-		Bms.output.writeLine("start",start);
-		Bms.output.writeLine("end",end);
 		
 	};
 
@@ -817,8 +815,8 @@ public class Slider{
 			if(!theme.sliderborder)canvas.noStroke();
 
 			if(classic){
-//				if(square)classicSquare(canvas);
-//				if(radio)classicRadio(canvas);
+				if(square)classicSquare(canvas);
+				if(radio)classicRadio(canvas);
 				if(bar)classicBar(canvas);
 			}else if(matrix){
 				if(square)Matrix();
@@ -880,8 +878,8 @@ public class Slider{
 		applet.fill(theme.sliderfillcol,theme.slidertransparency);
 		if(!theme.sliderfill)applet.noFill();
 
-		if(vertical)applet.rect(x,y+valuex,btnw-2,btnw-2,theme.r1,theme.r2,theme.r3,theme.r4);
-		else applet.rect(x+valuex,y,btnw,btnh,theme.r1,theme.r2,theme.r3,theme.r4);
+		if(vertical)applet.rect(x,y+valuex-btnw/2,btnw-2,btnw-2,theme.r1,theme.r2,theme.r3,theme.r4);
+		else applet.rect(x+valuex-btnw/2,y,btnw,btnh,theme.r1,theme.r2,theme.r3,theme.r4);
 
 		applet.fill(theme.slidertextcol);
 		if(vertical){
@@ -906,7 +904,7 @@ public class Slider{
 		canvas.fill(theme.sliderfillcol,theme.slidertransparency);
 		if(pos(mouse))canvas.fill(theme.sliderhcol,theme.slidertransparency);
 		if(!theme.sliderborder)canvas.noFill();
-
+//		applet.println("slider square",value);
 		if(vertical)canvas.rect(x,y,w,h,theme.r1,theme.r2,theme.r3,theme.r4);
 		else canvas.rect(x,y,w,h,theme.r1,theme.r2,theme.r3,theme.r4);
 
@@ -972,8 +970,8 @@ public class Slider{
 		if(pos(mouse))applet.fill(theme.sliderhcol,theme.slidertransparency);
 		if(!theme.sliderborder)applet.noFill();
 
-		if(vertical)applet.rect(x,y,w,h,theme.r1,theme.r2,theme.r3,theme.r4);
-		else applet.rect(x,y+h/2-1,w,2,theme.r1,theme.r2,theme.r3,theme.r4);
+		if(vertical)applet.rect(x+w,y,w,h,theme.r1,theme.r2,theme.r3,theme.r4);
+		else applet.rect(x,y+h*3/4-1,w,2,theme.r1,theme.r2,theme.r3,theme.r4);
 
 		applet.textSize(theme.slidertextsize);
 		applet.strokeWeight(theme.sliderstrokesize);
@@ -983,12 +981,13 @@ public class Slider{
 				applet.fill(col4);
 				btnh = h+10;
 			}
+			
 		}
-
 
 		if(label!=null){
 			applet.fill(theme.slidertextcol);
 			if(vertical){
+				
 				applet.pushMatrix();
 				applet.translate(x+txoff,y+tyoff);
 				applet.rotate(PConstants.PI/2);
@@ -1017,9 +1016,12 @@ public class Slider{
 		applet.fill(theme.sliderfillcol,theme.slidertransparency);
 		if(pos(mouse))  applet.fill(theme.sliderhcol,theme.slidertransparency);
 		if(!theme.sliderborder)applet.noFill();
-		if(vertical)applet.ellipse(x,y+valuex,btnw-2,btnw-2);
-		else applet.ellipse(x+valuex,y+h/2,(btnw+2)/2,(btnw+2)/2);
-
+		if(vertical) {
+			btnw = w*6;
+			applet.ellipse(x+btnw/4,y+valuex,btnw-2,btnw-2);
+		}
+		else applet.ellipse(x+valuex,y+h*3/4,(btnw+2)/2,(btnw+2)/2);
+//		if(mdown)applet.println("slider",label,value);
 		applet.fill(theme.slidertextcol);
 		if(vertical){
 			applet.pushMatrix();
@@ -1087,7 +1089,9 @@ public class Slider{
 		canvas.fill(theme.sliderfillcol,theme.slidertransparency);
 		if(pos(mouse))  canvas.fill(theme.sliderhcol,theme.slidertransparency);
 		if(!theme.sliderborder)canvas.noFill();
-		if(vertical)canvas.ellipse(x+w/2,y+valuex,(btnw+2)/2,(btnw+2)/2);
+		if(vertical) {
+			canvas.ellipse(x+w*2,y+valuex,(btnw+2)/2,(btnw+2)/2);
+		}
 		else canvas.ellipse(x+valuex,y+h/2,(btnw+2)/2,(btnw+2)/2);
 
 		canvas.fill(theme.slidertextcol);
@@ -1113,7 +1117,7 @@ public class Slider{
 		if(pos())applet.fill(theme.sliderhcol,theme.slidertransparency);
 		if(!theme.sliderfill)applet.noFill();
 
-		if(vertical)applet.rect(x,y+valuex,w,h-valuex,theme.r1,theme.r2,theme.r3,theme.r4);
+		if(vertical)applet.rect(x,y,w,h,theme.r1,theme.r2,theme.r3,theme.r4);
 		else applet.rect(x+valuex,y,w-valuex,h,theme.r1,theme.r2,theme.r3,theme.r4);
 
 		applet.textSize(theme.slidertextsize);
@@ -1231,28 +1235,16 @@ public class Slider{
 
 
 		boolean k1 = PApplet.dist(m.x,m.y,x,y)<radius;
-		boolean k3 = Bms.getObject(this);
-//		boolean k4 = 
+		
 		if(k1&&(theme.click||applet.mousePressed)){
 			mfdown = true;
 			tdown = false;
 		}
-
-		if(k1&&theme.click&&Bms.getObject()){
-			
-			mdown = true;
-			Bms.setObject(this);
-			mfdown = true;
-			tdown = false;
-			
-		}
-		if(mdown) {
-			
-			Bms.setObject(this);
-//			applet.println("slider piesq m mdown null obj",label);
-		}
-//		if(Bms.sliderObject!=null&&mdown)applet.println("slider piesq m mdown",label,Bms.sliderObject.label);
-//		if(k3)
+		if(k1&&theme.click&&Bms.getObject())Bms.setObject(this);
+		if(mdown)tdown = false;
+//			
+		boolean k3 = Bms.getObject(this);
+		if(k3)
 		if(mdown)
 			pieVal = PApplet.abs(2*PConstants.PI-(PApplet.atan2(x-m.x,y-m.y)+PConstants.PI/2));
 		if(pieVal>2*PConstants.PI)pieVal -=PConstants.PI*2;
@@ -1263,7 +1255,7 @@ public class Slider{
 
 		applet.ellipseMode(PConstants.CENTER);
 		applet.fill(theme.sliderouterfcol,theme.slidertransparency);
-		if(k&&(mdown))applet.fill(theme.sliderouterhcol,theme.slidertransparency);
+		if(k&&(k1||mdown))applet.fill(theme.sliderouterhcol,theme.slidertransparency);
 
 		applet.ellipse( x,y,radius*2-v1,radius*2-v1);
 		applet.fill(theme.sliderarcfcol,theme.slidertransparency);
@@ -1271,11 +1263,12 @@ public class Slider{
 		applet.arc(x,y, radius*2, radius*2, 0, pieVal, PConstants.PIE);
 
 		applet.fill(theme.sliderinnerfcol,theme.slidertransparency);
-		if(k&&(mdown))applet.fill(theme.sliderinnerhcol);
+		if(k&&(k1||mdown))applet.fill(theme.sliderinnerhcol);
 		if(!theme.sliderfill)applet.noFill();
 		applet.arc(x,y, radius*2-25, radius*2-25, 0, pieVal, PConstants.PIE);
 		//		if(!tooltipPos(mouse))
 		if(k3&&k&&(k1||mdown)) {
+			
 			applet.noStroke();
 			applet.fill(theme.sliderinnerhcol,theme.slidertransparency);
 			applet.stroke(theme.sliderinnerfcol,theme.slidertransparency);
@@ -1304,8 +1297,8 @@ public class Slider{
 		if(mdown&&!applet.mousePressed){
 			mdown = false;
 			if(Bms.getObject(this))Bms.clearObject(this);
-			if(!tooltipPos())mfdown = false;
 		}
+		if(!mdown&&Bms.getObject(this))Bms.clearObject(this);
 		if(!applet.mousePressed&&!tooltipPos())mfdown = false;
 	};
 
@@ -1321,24 +1314,16 @@ public class Slider{
 
 
 		boolean k1 = PApplet.dist(mouse.x,mouse.y,x,y)<radius;
-		boolean k3 = Bms.getObject(this);
-//		boolean k4 = 
+		
 		if(k1&&(theme.click||applet.mousePressed)){
 			mfdown = true;
 			tdown = false;
 		}
-		if(k1&&theme.click&&Bms.getObject()){
-			
-			mdown = true;
-			Bms.setObject(this);
-		}
-		if(mdown) {
-			tdown = false;
-			Bms.setObject(this);
-//			applet.println("slider piesq m mdown null obj",label);
-		}
-//		if(Bms.sliderObject!=null&&mdown)applet.println("slider piesq m mdown",label,Bms.sliderObject.label);
-//		if(k3)
+		if(k1&&theme.click&&Bms.getObject())Bms.setObject(this);
+		if(mdown)tdown = false;
+//			
+		boolean k3 = Bms.getObject(this);
+		if(k3)
 		if(mdown)
 			pieVal = PApplet.abs(2*PConstants.PI-(PApplet.atan2(x-mouse.x,y-mouse.y)+PConstants.PI/2));
 		if(pieVal>2*PConstants.PI)pieVal -=PConstants.PI*2;
@@ -1371,7 +1356,7 @@ public class Slider{
 		applet.stroke(theme.sliderstrokecol,theme.slidertransparency);
 		if(!theme.sliderborder)applet.noStroke();
 		canvas.fill(theme.sliderinnerfcol,theme.slidertransparency);
-		if(k&&(k1||mdown1))canvas.fill(theme.sliderinnerhcol);
+		if(k&&(k1||mdown))canvas.fill(theme.sliderinnerhcol);
 		canvas.ellipse( x,y,radius*2-25,radius*2-25);
 
 		applet.stroke(theme.sliderstrokecol,theme.slidertransparency);
@@ -1392,6 +1377,7 @@ public class Slider{
 			mdown = false;
 			if(Bms.getObject(this))Bms.clearObject(this);
 		}
+		if(!mdown&&Bms.getObject(this))Bms.clearObject(this);
 		if(!applet.mousePressed&&!tooltipPos(mouse))mfdown = false;
 	};
 
@@ -1457,23 +1443,58 @@ public class Slider{
 		if(!k&&!parentCanvas&&Bms.getObject(this)){
 			if(bar){
 				if(vertical){
-					if(applet.mouseY>y&&applet.mouseY<y + h-1)valuex = applet.mouseY-y;
+					if(applet.mouseY>y&&applet.mouseY<y + h-1)valuex = applet.mouseY - y;
 					if(applet.mouseY>y+h-1)valuex = h-1;
 				}else{
 					if(applet.mouseX>x&&applet.mouseX<x + w-1)valuex = applet.mouseX-x;
 					if(applet.mouseX>x+w-1)valuex = w-1;
 				}}
-			else if(radio||square){
+			else if(square){
 				if(vertical){
-					if(applet.mouseY>y&&applet.mouseY<y + h-1)valuex = applet.mouseY-y-1;
-					if(applet.mouseY>y+h-btnw)valuex = h-btnw;
+					if(applet.mouseY-btnw/2>y&&applet.mouseY<y + h-1)valuex = applet.mouseY-y-1;
+					if(applet.mouseY>y+h-btnw/2)valuex = h-btnw/2;
 				}else{
-					if(applet.mouseX>x&&applet.mouseX<x + w-1)valuex = applet.mouseX-x;
-					if(applet.mouseX>x+w-btnw)valuex = w-btnw;
+					if(applet.mouseX-btnw/2>x&&applet.mouseX<x + w-1)valuex = applet.mouseX-x;
+					if(applet.mouseX>x+w-btnw/2)valuex = w-btnw/2;
+				}}
+			else if(radio){
+				if(vertical){
+					if(applet.mouseY-btnw/2>y&&applet.mouseY<y + h-1)valuex = applet.mouseY-y-1;
+					if(applet.mouseY>y+h-btnw/2)valuex = h-btnw/2;
+				}else{
+					if(applet.mouseX-btnw/4>x&&applet.mouseX<x + w-1)valuex = applet.mouseX-x;
+					if(applet.mouseX-btnw/4>x+w)valuex = w-btnw/4;
 				}}
 			if(mdown) {
-				tempValue = PApplet.map( valuex, 1, w-1,startvalue,endvalue);
+				if(!vertical) {
+					float v = 0;
+					tempValue = PApplet.map( valuex, 0, w-1,startvalue,endvalue);
+					if(square) {
+						v = PApplet.map( valuex , btnw/2, w+btnw/2,0,w);
+						tempValue = PApplet.map( v , 1, w-1-btnw,startvalue,endvalue);
+					}
+					if(radio) {
+						v = PApplet.map( valuex , btnw/4, w+btnw/4,0,w);
+						tempValue = PApplet.map( v , 1, w-btnw/2,startvalue,endvalue);
+					}
+				}
+				else {
+					tempValue = PApplet.map( valuex, 1, h-1,startvalue,endvalue);
+					if(square) {
+						float v = PApplet.map( valuex , 1, h,-btnw/2,h+1);
+						tempValue = PApplet.map( v , 1, h-1-btnw/2,startvalue,endvalue);
+					}
+					if(radio) {
+						float v = PApplet.map( valuex , btnw/2, w-btnw/2,-10,w);
+						v = PApplet.map( valuex , 1, h,-btnw/2,h);
+						tempValue = PApplet.map( v , 1, h-1-btnw/2,startvalue,endvalue);
+					}
+				}
+				
 				value = tempValue;
+				if(value<startvalue)value = startvalue;
+				if(value>endvalue)value = endvalue;
+//				if(radio)applet.println("slider",label,value);
 			}
 		}
 		if(mdown&&!applet.mousePressed&&!tdown&&Bms.getObject(this)){
@@ -1536,7 +1557,7 @@ public class Slider{
 			}
 
 	};
-
+	
 	public void mouseFunctions(PVector m){
 		
 		boolean k = tooltip==null||tooltip!=null&&!tooltipPos(m);
@@ -1557,25 +1578,59 @@ public class Slider{
 			mdown = true;
 			if(bar){
 				if(vertical){
-					if(m.y>y&&m.y<y + h-1)valuex = m.y-y;
+					if(m.y>y&&m.y<y + h-1)valuex = m.y - y;
 					if(m.y>y+h-1)valuex = h-1;
 				}else{
 					if(m.x>x&&m.x<x + w-1)valuex = m.x-x;
 					if(m.x>x+w-1)valuex = w-1;
 				}}
-			else if(radio||square){
+			else if(square){
 				if(vertical){
-					if(m.y>y-1+btnw/2&&m.y<y + h-1)valuex = m.y-y-1;
+					if(m.y-btnw/2>y&&m.y<y + h-1)valuex = m.y-y-1;
 					if(m.y>y+h-btnw/2)valuex = h-btnw/2;
-
 				}else{
-					if(m.x>x-1+btnw/2&&m.x<x + w)valuex = m.x-x;
+					if(m.x-btnw/2>x&&m.x<x + w-1)valuex = m.x-x;
 					if(m.x>x+w-btnw/2)valuex = w-btnw/2;
 				}}
-				if(mdown) {
-					tempValue = PApplet.map( valuex, 1, w-1,startvalue,endvalue);
-					value = tempValue;
+			else if(radio){
+				if(vertical){
+					if(m.y-btnw/2>y&&m.y<y + h-1)valuex = m.y-y-1;
+					if(m.y>y+h-btnw/2)valuex = h-btnw/2;
+				}else{
+					if(m.x-btnw/4>x&&m.x<x + w-1)valuex = m.x-x;
+					if(m.x-btnw/4>x+w)valuex = w-btnw/4;
+				}}
+			if(mdown) {
+				if(!vertical) {
+					float v = 0;
+					tempValue = PApplet.map( valuex, 0, w-1,startvalue,endvalue);
+					if(square) {
+						v = PApplet.map( valuex , btnw/2, w+btnw/2,0,w);
+						tempValue = PApplet.map( v , 1, w-1-btnw,startvalue,endvalue);
+					}
+					if(radio) {
+						v = PApplet.map( valuex , btnw/4, w+btnw/4,0,w);
+						tempValue = PApplet.map( v , 1, w-btnw/2,startvalue,endvalue);
+					}
 				}
+				else {
+					tempValue = PApplet.map( valuex, 1, h-1,startvalue,endvalue);
+					if(square) {
+						float v = PApplet.map( valuex , 1, h,-btnw/2,h+1);
+						tempValue = PApplet.map( v , 1, h-1-btnw/2,startvalue,endvalue);
+					}
+					if(radio) {
+						float v = PApplet.map( valuex , btnw/2, w-btnw/2,-10,w);
+						v = PApplet.map( valuex , 1, h,-btnw/2,h);
+						tempValue = PApplet.map( v , 1, h-1-btnw/2,startvalue,endvalue);
+					}
+				}
+				
+				value = tempValue;
+				if(value<startvalue)value = startvalue;
+				if(value>endvalue)value = endvalue;
+//				if(radio)applet.println("slider",label,value);
+			}
 			}
 		if(mdown&&!applet.mousePressed) {
 //			float v = applet.map(valuex, 0, w-1, startvalue, endvalue);
@@ -1597,13 +1652,13 @@ public class Slider{
 	public void mousePieFunctions(PVector m){
 		
 		if(tooltip==null&&!pos(mouse)&&applet.mousePressed&&!mdown&&Bms.sliderObject==this){
-			Bms.sliderObject = null;
-			mdown = true;
+//			Bms.sliderObject = null;
+//			mdown = true;
 //			applet.println(parentTab.x,parentTab.y,applet.mouseX,mouse.x,applet.mouseY,mouse.y);
 		}
 		if(pos(mouse)&&applet.mousePressed&&!mdown&&Bms.sliderObject==null){
-			Bms.sliderObject = this;
-			mdown = true;
+//			Bms.sliderObject = this;
+//			mdown = true;
 			//applet.println(parentTab.x,parentTab.y,applet.mouseX,mouse.x,applet.mouseY,mouse.y);
 		}
 
@@ -1633,7 +1688,11 @@ public class Slider{
 	};
 
 	boolean pos(){
-		if(pie)return PApplet.dist(applet.mouseX,applet.mouseY,x,y)<radius;
+		if(radio) {
+			if(vertical)return applet.mouseX>x-btnw/4&&applet.mouseX<x+w+btnw/2&&applet.mouseY>y&&applet.mouseY<y+h;
+			else return applet.mouseX>x&&applet.mouseX<x+w&&applet.mouseY>y&&applet.mouseY<y+h;
+		}
+		else if(pie)return PApplet.dist(applet.mouseX,applet.mouseY,x,y)<radius;
 		else return applet.mouseX>x&&applet.mouseX<x+w&&applet.mouseY>y&&applet.mouseY<y+h;
 	};
 
@@ -1909,15 +1968,15 @@ public class Slider{
 			if(Bms.getObject(this)&&mouseIn){
 				
 				v = PApplet.map( valuex, 1, w-1,start,end);
-				value = v;
+//				value = v;
 				update = false;
 //				mdown = true;
 //				applet.println("set mousein 00",label,start,end,value);
 			}}else{
 				if(Bms.getObject(this)&&mouseIn){
 //					if(applet.mousePressed)mdown = true;
-					v = PApplet.map( valuex, 1, w-1,start,end);
-					value = v;
+//					v = PApplet.map( valuex, 1, h-1,start,end);
+//					value = v;
 					update = false;
 				}}
 //		if(!applet.mousePressed)mdown = false;
@@ -2061,10 +2120,52 @@ public class Slider{
 		square = false;
 	};
 	
+	public void setRadius(Theme t, float a) {
+		this.theme = t;
+		newTheme = t;
+		r1 = theme.buttonr1 = a;
+		r2 = theme.buttonr2 = a;
+		r3 = theme.buttonr3 = a;
+		r4 = theme.buttonr4 = a;
+	};
+	
+	public void setRadius(float a) {
+		if(newTheme==null)newTheme = new Theme(applet);
+		theme = newTheme;
+		theme.buttonr1 = a;
+		theme.buttonr2 = a;
+		theme.buttonr3 = a;
+		theme.buttonr4 = a;
+		r1 = a;
+		r2 = a;
+		r3 = a;
+		r4 = a;
+	};
+
+	public void setRadius(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		r1 = newTheme.buttonr1 = a;
+		r2 = newTheme.buttonr2 = b;
+		r3 = newTheme.buttonr3 = c;
+		r4 = newTheme.buttonr4 = d;
+		theme = newTheme;
+		
+	};
+
+	public void setRadius(Theme t, float a,float b,float c,float d) {
+		theme = t;
+		newTheme = t;
+		r1 = newTheme.buttonr1 = a;
+		r2 = newTheme.buttonr2 = b;
+		r3 = newTheme.buttonr3 = c;
+		r4 = newTheme.buttonr4 = d;
+	};
+	
 	public void setTextCol(Theme t) {
 		theme = t;
 	};
-
+	
 	public void setTextCol(Theme t, float a) {
 		
 		newTheme = t;
@@ -2120,6 +2221,18 @@ public class Slider{
 		newTheme.slidertextcol = applet.color(a,b,c,d);
 		theme = newTheme;
 	};
+	
+	public void setTextColor( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextColor(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
 
 	public void setTextSize( float a) {
 		if(newTheme==null) newTheme = new Theme(Bms);
@@ -2149,29 +2262,5 @@ public class Slider{
 		if(newTheme==null) newTheme = new Theme(Bms);
 		newTheme.sliderhcol = applet.color(a,b,c,d);
 		theme = newTheme;
-	};
-	
-	public void setRadius(float a) {
-		newTheme = new Theme(applet);
-		theme = newTheme;
-		theme.sliderr1 = a;
-		theme.sliderr2 = a;
-		theme.sliderr3 = a;
-		theme.sliderr4 = a;
-		r1 = a;
-		r2 = a;
-		r3 = a;
-		r4 = a;
-	};
-	
-	public void setRadius(float a,float b,float c,float d) {
-		if(newTheme==null) newTheme = new Theme(Bms);
-		newTheme.slidertextcol = applet.color(a);
-		r1 = newTheme.sliderr1 = a;
-		r2 = newTheme.sliderr2 = b;
-		r3 = newTheme.sliderr3 = c;
-		r4 = newTheme.sliderr4 = d;
-		theme = newTheme;
-		
 	};
 };

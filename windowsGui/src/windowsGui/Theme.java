@@ -23,7 +23,7 @@ public class Theme extends MouseFunctions{
 			   textboxfillcol,textboxhcol,texboxtextcol,dropdownfillcol,
 			   textboxstrokecol,dropdownhcol,dropdowntextcol,
 			   dropdownstrokecol,scol,dropdowntogglecol,textareafillcol,
-			   textareastrokecol,textareatextcol,textareahcol,maxcount = 60;
+			   textareastrokecol,textareatextcol,textareahcol,textareatexthcol,maxcount = 60;
 	public float slidertextsize,buttontextsize,menutextsize,
 				 buttontrancparency,buttonstrokesize,tabstrokesize,
 				 sliderstrokesize,menustrokesize,dockstrokesize,
@@ -37,7 +37,10 @@ public class Theme extends MouseFunctions{
 				 tabr4,buttonr1,buttonr2,buttonr3,buttonr4,windowr1,windowr2,windowr3,
 				 windowr4,menur1,menur2,menur3,menur4,docktextsize,
 				 textareastrokesize,textarear1,textarear2,textarear3,
-				 textarear4,textareatransparency,textareatextsize,dclicklimit = 100;
+				 textarear4,textareatransparency,textareatextsize,dclicklimit = 100,
+				 dropdownr1,dropdownr2,dropdownr3,dropdownr4,buttonAnimationSpeed,tabAnimationSpeed,
+				 sliderAnimationSpeed,sliderBoxAnimationSpeed,dropDownAnimationSpeed,menuAnimationSpeed,
+				 windowAnimationSpeed,textAnimationSpeed;
 	public boolean border = true,fill = true,transparent,sliderfill,menufill,
 				   tabfill,windowfill,buttonfill,sliderborder,buttonborder,
 				   tabborder,windowborder,menuborder,dockborder,dockfill,
@@ -326,7 +329,7 @@ public class Theme extends MouseFunctions{
 	
 	public void init() {
 		col = p.color(0, 255, 73);
-		bgcol = p.color(52,11,11);
+		bgcol = p.color(84, 204, 222);
 		bcol = p.color(255);
 		tcol = p.color(219, 147, 114); 
 		fcol = p.color(0, 255, 73);

@@ -724,9 +724,8 @@ public class Menu {
 		applet.println("save menu");
 		Bms.output.writeLine("");
 		Bms.output.writeLine("_Menu");
-		Bms.output.writeLine("BmsIndex",BmsIndex);
+		Bms.output.writeLine("arrayIndex",arrayIndex);
 		Bms.output.writeLine("themeIndex",themeIndex);
-		Bms.output.writeLine("localTheme",localTheme);
 		Bms.output.write(x+",");
 		Bms.output.write(y+",");
 		Bms.output.write(w+",");
@@ -752,6 +751,7 @@ public class Menu {
 //			Bms.output.write("grid");
 //		}
 //		else Bms.output.write("plain");
+		Bms.output.write(index);
 		Bms.output.writeLine("");
 		applet.println("saved menu");
 	};
@@ -845,6 +845,7 @@ public class Menu {
 		getState(canvas);
 		drawButtons(canvas);
 		//drawDmenu();
+//		if(sliders.size()>0)applet.println("menu slider",sliders.get(0).label);
 		drawsliders();
 	};
 
@@ -1241,7 +1242,7 @@ public class Menu {
 					}else {
 						//						a.horizontal = true; 
 						a.y = y; 
-						a.x = x + (a.w + spacing) * i;
+						a.x = x + (w /sliders.size() + spacing) * i;
 						//						a.h = 
 					}
 				}else{
@@ -1305,7 +1306,9 @@ public class Menu {
 										if (window<=0) window = 0;
 
 									}}
+//				if(a.mdown)applet.println("menu slider",a.label,a.value,a.vertical);
 				if (vertical) {
+					
 					if (y + window >= a.y){
 
 						if (a.visible){
@@ -1393,7 +1396,7 @@ public class Menu {
 
 		if ((pos()||toggle)) open_menu = true;
 		else open_menu = false;
-		if (draggable&&dpos()&&applet.mousePressed&&!drag&&!mdown&&!m5down) {
+		if (draggable&&dpos()&&applet.mousePressed&&!drag&&!mdown&&!m5down&&Bms.getObject()) {
 			mdown = true;
 			drag = true;
 			dx = applet.mouseX - x;
@@ -1535,7 +1538,7 @@ public class Menu {
 
 		if ((pos(mousePos)||toggle)) open_menu = true;
 		else open_menu = false;
-		if (draggable&&dpos(mousePos)&&applet.mousePressed&&!drag&&!mdown&&!m5down) {
+		if (draggable&&dpos(mousePos)&&applet.mousePressed&&!drag&&!mdown&&!m5down&&Bms.getObject()) {
 			mdown = true;
 			drag = true;
 			dx = applet.mouseX - x;
@@ -2768,7 +2771,7 @@ public class Menu {
 			a.toggleBox = false;
 		}
 
-		w = bwidth+w;
+//		w = bwidth+w;
 		twidth = w;
 	};
 
@@ -2872,50 +2875,103 @@ public class Menu {
 
 	};
 
-	public void setTextColor(int c) {
-		if(newTheme==null) newTheme = new Theme(Bms);
-		theme = newTheme;
-		initColors();
-		tcol = c;
-		localTheme = true;
-	};
-	
-	public void setTextColor(float a, float b,float c,float d) {
-		if(newTheme==null) newTheme = new Theme(Bms);
-		theme = newTheme;
-		initColors();
-		tcol = applet.color(a,b,c,d);
-		localTheme = true;
-	};
-	
-	public void setTextColor(Theme t) {
-		theme = t;
-		initColors();
-		tcol = t.menutextcol;
-		localTheme = true;
-	};
-	
-	public void setTextCol(int c) {
-		if(newTheme==null) newTheme = new Theme(Bms);
-		theme = newTheme;
-		initColors();
-		tcol = c;
-		localTheme = true;
-	};
-	
-	public void setTextCol(float a, float b,float c,float d) {
-		if(newTheme==null) newTheme = new Theme(Bms);
-		theme = newTheme;
-		initColors();
-		tcol = applet.color(a,b,c,d);
-		localTheme = true;
-	};
-	
 	public void setTextCol(Theme t) {
 		theme = t;
-		initColors();
-		tcol = t.menutextcol;
-		localTheme = true;
+	};
+
+	public void setTextCol(Theme t, float a) {
+		
+		newTheme = t;
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol(Theme t,float a,float b,float c,float d) {
+		newTheme = t;
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		
+	};
+
+	public void setTextSize(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.buttontextsize = a;
+	};
+
+	public void setFillCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.buttonfillcol = applet.color(a);
+	};
+
+
+	public void sethCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.buttonhcol = applet.color(a);
+	};
+
+	public void sethCol(Theme theme,float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+	
+	public void setTextColor( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextColor(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+
+	public void setTextSize( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextsize = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setFillCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonfillcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void sethCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void sethCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		for(int i=0;i<items.size();i++) {
+			Button b1 = items.get(i);
+			b1.sethCol(c);
+		}
+		for(int i=0;i<sliders.size();i++) {
+			Slider s = sliders.get(i);
+			s.sethCol(c);
+		}
 	};
 
 	public void setAllTextColor(int c) {
@@ -2926,15 +2982,11 @@ public class Menu {
 
 		for(int i=0;i<items.size();i++) {
 			Button b = items.get(i);
-			b.initColors();
-			b.localTheme = true;
-			b.tcol = c;
+			b.setTextCol(c);
 		}
 		for(int i=0;i<sliders.size();i++) {
 			Slider s = sliders.get(i);
-			s.initColors();
-			s.localTheme = true;
-			s.tcol = c;
+			s.setTextCol(c);
 		}
 	};
 	
@@ -3051,10 +3103,20 @@ public class Menu {
 		if(i<items.size()&&items.get(i).submenu!=null)return items.get(i).submenu;
 		else return null;
 	};
+	
+	public void setRadius(Theme t) {
+		newTheme = t;
+		theme = t;
+		
+		r1 = theme.buttonr1;
+		r2 = theme.buttonr2;
+		r3 = theme.buttonr3;
+		r4 = theme.buttonr4;
+	};
 
 	public void setRadius(float a){
 		if(newTheme==null) newTheme = new Theme(Bms);
-		theme = newTheme;
+		
 		newTheme.r1 = a;
 		newTheme.r2 = a;
 		newTheme.r3 = a;
@@ -3065,16 +3127,16 @@ public class Menu {
 		newTheme.buttonr3 = a;
 		newTheme.buttonr4 = a;
 
-		newTheme.tabr1 = a;
-		newTheme.tabr2 = a;
-		newTheme.tabr3 = a;
-		newTheme.tabr4 = a;
-
 		newTheme.sliderr1 = a;
 		newTheme.sliderr2 = a;
 		newTheme.sliderr3 = a;
 		newTheme.sliderr4 = a;
-
+		
+		theme = newTheme;
+		r1 = a;
+		r2 = a;
+		r3 = a;
+		r4 = a;
 
 
 		for(int i=0;i<items.size();i++){
@@ -3738,4 +3800,8 @@ public class Menu {
 		if(getButton(i)!=null) return getButton(i).submenu;
 		else return null;
 	};
+	
+	public void setTheme(Theme t) {
+		
+	}
 };

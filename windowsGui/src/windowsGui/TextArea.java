@@ -19,14 +19,14 @@ public class TextArea extends KeyboardFunctions{
 	public PVector mouse;
 	public PGraphics canvas,parentCanvas;
 	public tab parentTab;
-	Theme myTheme;
+	Theme theme,newTheme;
 	Window parentWindow;
 	Slider parentSlider;
 
 	public TextArea(float x_,float y_,float w_,float h_,BMS bms){
 		Bms = bms;
 		applet = bms.applet;
-		myTheme = bms.theme;
+		theme = bms.theme;
 		register(this);
 		//		init(applet);
 		x = x_;
@@ -36,17 +36,13 @@ public class TextArea extends KeyboardFunctions{
 		w = w_;
 		h = h_;
 
-		//applet.textSize(textSize);
 		canvas = applet.createGraphics((int) w+1000,(int) h+1000);
-		//while(applet.textWidth(blankLine)<w-applet.textWidth("")
-
-
 	};
 
 	public TextArea(float x_,float y_,float w_,float h_,String Label,BMS bms){
 		Bms = bms;
 		applet = bms.applet;
-		myTheme = bms.theme;
+		theme = bms.theme;
 		register(this);
 		//		init(applet);
 		label = Label;
@@ -58,15 +54,13 @@ public class TextArea extends KeyboardFunctions{
 		h = h_;
 
 		canvas = applet.createGraphics((int) w,(int) h);
-		//applet.textSize(textSize);
-		//while(applet.textWidth(blankLine)<w-applet.textWidth("")
 
 	};
 
 	public TextArea(float x_,float y_,float w_,float h_,String Label,fileOutput f){
 		Bms = f.Bms;
 		applet = Bms.applet;
-		myTheme = Bms.theme;
+		theme = Bms.theme;
 		register(this);
 		//		init(applet);
 		label = Label;
@@ -78,22 +72,16 @@ public class TextArea extends KeyboardFunctions{
 		h = h_;
 
 		canvas = applet.createGraphics((int) w,(int) h);
-		//applet.textSize(textSize);
-		//while(applet.textWidth(blankLine)<w-applet.textWidth("")
 
 	};
 
 	public void draw(){
-		col = myTheme.textareafillcol;
-		//		if(pos())col = myTheme.textareahcol;
+		col = theme.textareafillcol;
+		//		if(pos())col = theme.textareahcol;
 		boolean k = parentSlider==null&&Bms.getObject()||parentSlider!=null&&Bms.getObject(parentSlider);
-		textSize = myTheme.textareatextsize;
+		textSize = theme.textareatextsize;
 		setMouse();
-		if(pos())
-			col = applet.color(0);
-		//		getCursor();
-		//if(mouse)
-//		applet.println("tearea draw 00");
+		if(pos())col = applet.color(theme.textareahcol);
 		if(parentTab!=null)draw(parentCanvas,true);
 		else draw(true);
 
@@ -114,31 +102,31 @@ public class TextArea extends KeyboardFunctions{
 			canvas.beginDraw();
 			canvas.background(0,0);
 
-			canvas.stroke(myTheme.textareastrokecol,myTheme.textareatransparency);
-			canvas.strokeWeight(myTheme.textareastrokesize);
-			if(!myTheme.textareaborder)canvas.noStroke();
+			canvas.stroke(theme.textareastrokecol,theme.textareatransparency);
+			canvas.strokeWeight(theme.textareastrokesize);
+			if(!theme.textareaborder)canvas.noStroke();
 
-			canvas.fill(col,myTheme.textareatransparency);
-			if(!myTheme.textareafill)canvas.noFill();
+			canvas.fill(col,theme.textareatransparency);
+			if(!theme.textareafill)canvas.noFill();
 			if(!line)
 				canvas.rect(0,0,w,h,r1,r2,r3,r4);
 			else {
-				canvas.stroke(myTheme.textareafillcol,myTheme.textareatransparency);
-				canvas.strokeWeight(myTheme.textareastrokesize);
-				if(pos())canvas.stroke(myTheme.textareahcol,myTheme.textareatransparency);
+				canvas.stroke(theme.textareafillcol,theme.textareatransparency);
+				canvas.strokeWeight(theme.textareastrokesize);
+				if(pos())canvas.stroke(theme.textareahcol,theme.textareatransparency);
 				canvas.line(0,0+h-2,w,h-2);
 			}
 
 			canvas.stroke(0);
 			canvas.strokeWeight(2);
 			if(label!=null){
-				canvas.fill(myTheme.textareatextcol);
+				canvas.fill(theme.textareatextcol);
 				canvas.text(label,0,0+(textSize)-3);
 				//println(label);
 			}
 			float ry = textSize;
 
-			canvas.fill(myTheme.textareatextcol);
+			canvas.fill(theme.textareatextcol);
 			applet.textSize(textSize);
 			lxpos = 0;
 //			canvas.stroke(9);
@@ -154,17 +142,17 @@ public class TextArea extends KeyboardFunctions{
 
 				canvas.fill(0,0,255,50);
 
-				canvas.stroke(myTheme.textareastrokecol,myTheme.textareatransparency);
-				//				canvas.strokeWeight(myTheme.textareastrokesize);
+				canvas.stroke(theme.textareastrokecol,theme.textareatransparency);
+				//				canvas.strokeWeight(theme.textareastrokesize);
 				canvas.noStroke();
-				if(!myTheme.textareaborder)applet.noStroke();
+				if(!theme.textareaborder)applet.noStroke();
 
 				for(int i=0;i<textArea.length;i++){
 
 					//canvas.rect(0,0+(textSize+spacing)*i,w,ry);
 				}
 
-				canvas.fill(myTheme.textareatextcol);
+				canvas.fill(theme.textareatextcol);
 				canvas.textSize(ry);
 				if(textSize==h)tyoff = -3;
 				for(int i=0;i<textArea.length;i++){
@@ -192,35 +180,35 @@ public class TextArea extends KeyboardFunctions{
 				canvas.beginDraw();
 				canvas.background(0,0);
 
-				canvas.stroke(myTheme.textareastrokecol,myTheme.textareatransparency);
-				canvas.strokeWeight(myTheme.textareastrokesize);
-				if(!myTheme.textareaborder)canvas.noStroke();
+				canvas.stroke(theme.textareastrokecol,theme.textareatransparency);
+				canvas.strokeWeight(theme.textareastrokesize);
+				if(!theme.textareaborder)canvas.noStroke();
 
-				canvas.fill(col,myTheme.textareatransparency);
-				if(!myTheme.textareafill)canvas.noFill();
+				canvas.fill(col,theme.textareatransparency);
+				if(!theme.textareafill)canvas.noFill();
 
 				if(!line)
 					canvas.rect(0,0,w,h,r1,r2,r3,r4);
 				else {
-					canvas.stroke(myTheme.textareafillcol,myTheme.textareatransparency);
-					canvas.strokeWeight(myTheme.textareastrokesize);
-					if(pos())canvas.stroke(myTheme.textareahcol,myTheme.textareatransparency);
+					canvas.stroke(theme.textareafillcol,theme.textareatransparency);
+					canvas.strokeWeight(theme.textareastrokesize);
+					if(pos())canvas.stroke(theme.textareahcol,theme.textareatransparency);
 					canvas.line(0,h-1,w,h-1);
 				}
 
 
 
-				canvas.stroke(myTheme.textareastrokecol,myTheme.textareatransparency);
+				canvas.stroke(theme.textareastrokecol,theme.textareatransparency);
 				canvas.strokeWeight(2);
 				float ry = textSize;
 				applet.textSize(textSize);
 				if(label!=null){
 
 					canvas.fill(0);
-					canvas.fill(myTheme.textareatextcol);
+					canvas.fill(theme.textareatextcol);
 					canvas.text(label,0,0+(textSize)-3);
 				}
-				canvas.fill(myTheme.textareatextcol);
+				canvas.fill(theme.textareatextcol);
 				//				canvas.textSize(h);
 				//				applet.textSize(h);
 				//lxpos = 0;
@@ -246,12 +234,12 @@ public class TextArea extends KeyboardFunctions{
 //								canvas.rect(0,0+(textSize+spacing)*i,w,ry);
 //						}else canvas.rect(0,0+(textSize+spacing)*i,w,ry,r1,r2,r3,r4);
 //					}
-//					canvas.stroke(myTheme.textareafillcol,myTheme.textareatransparency);
-//					canvas.strokeWeight(myTheme.textareastrokesize);
+//					canvas.stroke(theme.textareafillcol,theme.textareatransparency);
+//					canvas.strokeWeight(theme.textareastrokesize);
 //					
 //					canvas.line(x,y+h-2,w,2);
-					canvas.fill(myTheme.textareatextcol);
-					canvas.textSize(myTheme.textareatextsize);
+					canvas.fill(theme.textareatextcol);
+					canvas.textSize(theme.textareatextsize);
 					canvas.textSize(ry);
 					if(textSize==h)tyoff = -3;
 					for(int i=0;i<textArea.length;i++){
@@ -821,7 +809,15 @@ public class TextArea extends KeyboardFunctions{
 	//public float
 
 	public void setRadius(float a) {
-
+		if(newTheme==null) newTheme = new Theme(Bms);
+		
+		newTheme.r1 = a;
+		newTheme.r2 = a;
+		newTheme.r3 = a;
+		newTheme.r4 = a;
+		
+		theme = newTheme;
+		
 		r1 = a;
 		r2 = a;
 		r3 = a;
@@ -829,11 +825,120 @@ public class TextArea extends KeyboardFunctions{
 	};
 
 	public void setRadius(float a,float b,float c,float d) {
-
+		if(newTheme==null) newTheme = new Theme(Bms);
+		
+		newTheme.r1 = a;
+		newTheme.r2 = b;
+		newTheme.r3 = c;
+		newTheme.r4 = d;
+		
+		theme = newTheme;
 		r1 = a;
 		r2 = b;
 		r3 = c;
 		r4 = d;
+	};
+	
+	public void setTextCol(Theme t) {
+		theme = t;
+	};
+
+	public void setTextCol(Theme t, float a) {
+		
+		newTheme = t;
+		newTheme.textareatextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol(Theme t,float a,float b,float c,float d) {
+		newTheme = t;
+		newTheme.textareatextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		
+	};
+	
+	public void setTextColor( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareatextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextColor(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareatextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+
+	public void setTextSize(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.textareatextsize = a;
+	};
+
+	public void setFillCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.textareafillcol = applet.color(a);
+	};
+
+	public void setFillCol(Theme theme,float a,float b,float c,float d) {
+		newTheme = theme;
+		theme = newTheme;
+		theme.textareafillcol = applet.color(a,b,c,d);
+	};
+
+	public void sethCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.textareahcol = applet.color(a);
+	};
+
+	public void sethCol(Theme theme,float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareahcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareatextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareatextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+
+	public void setTextSize( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareatextsize = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setFillCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareafillcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setFillCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareafillcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+
+	public void sethCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareahcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void sethCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.textareahcol = applet.color(a,b,c,d);
+		theme = newTheme;
 	};
 
 	public void setTab(tab t){
@@ -859,8 +964,6 @@ public class TextArea extends KeyboardFunctions{
 		text = "";
 		xpos = 0;
 		ypos = 0;
-
-
 	};
 
 	public void setPos(float a,float b) {
@@ -883,11 +986,26 @@ public class TextArea extends KeyboardFunctions{
 		
 	};
 	
-	public void defaultSave() {
+	public void saveContents() {
 
 		for(int i=0;i<textArea.length;i++) {
 			
 		}
+	};
+	
+	public void defaultSave() {
+		
+		applet.println("save textArea");
+		Bms.output.writeLine("");
+		Bms.output.writeLine("_textArea");
+		Bms.output.writeLine("arrayIndex",arrayIndex);
+		Bms.output.writeLine("themeIndex",themeIndex);
+		Bms.output.write(x+",");
+		Bms.output.write(y+",");
+		Bms.output.write(w+",");
+		Bms.output.write(h+",");
+		Bms.output.writeLine("");
+		
 	};
 
 	public void set(float a) {

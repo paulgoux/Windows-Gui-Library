@@ -68,7 +68,7 @@ public class tab extends tabBoundary {
 		this.w = w;
 		this.h = h;
 		Bms = bms;
-		applet = bms.applet;
+		applet = BMS.applet;
 		theme = Bms.theme;
 		canvas = createCanvas(bms);
 		//tabs.add(this);
@@ -85,7 +85,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 		//tabs.add(this);
 		states.add(this);
 		canvas = createCanvas(bms);
@@ -102,7 +102,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 		canvas = createCanvas(bms);
 		states.add(this);
 		tabcol = applet.color(0,255,175);
@@ -116,7 +116,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 		canvas = createCanvas(bms);
 		states.add(this);
 		createConstruct2();
@@ -131,7 +131,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 
 		this.label = label;
 		this.itemLabel = label;
@@ -154,7 +154,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 		this.label = label;
 		this.itemLabel = label;
 		title = new Button(x,y, w, 20, label,bms);
@@ -176,7 +176,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 		this.label = label;
 		this.itemLabel = label;
 		title = new Button(x,y, w1, h1, label,bms);
@@ -198,7 +198,7 @@ public class tab extends tabBoundary {
 		this.h = h;
 		Bms = bms;
 		theme = Bms.theme;
-		applet = bms.applet;
+		applet = BMS.applet;
 		this.label = label;
 		this.itemLabel = label;
 		title = new Button(x, y, w, 20, label,bms);
@@ -324,20 +324,20 @@ public class tab extends tabBoundary {
 
 	PGraphics createCanvas(BMS bms) {
 		Bms = bms;
-		PGraphics pg = bms.applet.createGraphics((int) (w), (int)(h));
+		PGraphics pg = BMS.applet.createGraphics((int) (w), (int)(h));
 		//pg.setLocation(x, y);
 		return pg;
 	};
 
 	PGraphics createCanvas2(BMS bms) {
 		Bms = bms;
-		PGraphics pg = bms.applet.createGraphics((int) (w), (int)(h));
+		PGraphics pg = BMS.applet.createGraphics((int) (w), (int)(h));
 		return pg;
 	};
 
 	PGraphics createCanvas(float w,float h,BMS bms) {
 		Bms = bms;
-		PGraphics pg = bms.applet.createGraphics((int) (w), (int)(h));
+		PGraphics pg = BMS.applet.createGraphics((int) (w), (int)(h));
 		return pg;
 	}
 
@@ -354,7 +354,7 @@ public class tab extends tabBoundary {
 	};
 
 	public void save(){
-		applet.println("save tab",title.label);
+		PApplet.println("save tab",title.label);
 		fileOutput output = Bms.output;
 		output.setSketchLocation("data\\preferences.txt");
 		output.checkLocation();
@@ -366,28 +366,33 @@ public class tab extends tabBoundary {
 	};
 	
 	public void defaultSave(){
-		if(title!=null)applet.println("save tab",title.label);
-		else applet.println("save tab no title");
+		if(title!=null)PApplet.println("save tab",title.label);
+		else PApplet.println("save tab no title");
 		Bms.output.writeLine("");
-		Bms.output.writeLine("Tab",title.label);
+		Bms.output.writeLine("_Tab",title.label);
+		if(title!=null)Bms.output.writeLine(title.label);
 		if(BMSbound) {
 			Bms.output.writeLine("BMSbound",BMSbound);
 			Bms.output.writeLine(arrayIndex);
 		}
+		Bms.output.write(x+",");
+		Bms.output.write(y+",");
+		Bms.output.write(w+",");
+		Bms.output.write(h+",");
+		Bms.output.writeLine("toggle",toggle);
+		Bms.output.writeLine("visible",visible);
+		Bms.output.writeLine("docked",docked);
 		saveMenu();
 		saveTabs();
-//		saveSliderBox();
+		saveSliders();
+		saveSliderBox();
 		savedMenus();
+		saveButtons();
+		saveTextAreas();
+		
 	};
 	
-	public void saveWindow(){
-
-		for(int i=0;i<sliderBoxes.size();i++){
-			SliderBox s = sliderBoxes.get(i);
-
-			s.save();
-		}
-	};
+	
 	
 	public void saveDock(){
 
@@ -409,19 +414,28 @@ public class tab extends tabBoundary {
 	
 	public void savedMenus(){
 
-		for(int i=0;i<sliderBoxes.size();i++){
-			SliderBox s = sliderBoxes.get(i);
-
-			s.defaultSave();
+		for(int i=0;i<dmenus.size();i++){
+			Dropdown d = dmenus.get(i);
+			d.arrayIndex = i;
+			d.defaultSave();
 		}
 	};
 
-	public void saveText(){
+	public void saveTextAreas(){
 
 		for(int i=0;i<textareas.size();i++){
 			TextArea t = textareas.get(i);
+			t.arrayIndex = i;
+			t.defaultSave();
+		}
+	};
+	
+	public void saveSliders(){
 
-//			t.defaultSave();
+		for(int i=0;i<sliders.size();i++){
+			Slider s = sliders.get(i);
+			s.arrayIndex = i;
+			s.defaultSave();
 		}
 	};
 
@@ -429,6 +443,7 @@ public class tab extends tabBoundary {
 
 		for(int i=0;i<sliderBoxes.size();i++){
 			SliderBox s = sliderBoxes.get(i);
+			s.tabIndex = tabIndex;
 			s.arrayIndex = i;
 			s.defaultSave();
 		}
@@ -439,7 +454,7 @@ public class tab extends tabBoundary {
 		for(int i=0;i<buttons.size();i++){
 			Button b = buttons.get(i);
 			b.arrayIndex = i;
-			b.save();
+			b.defaultSave();
 		}
 	};
 
@@ -1173,7 +1188,7 @@ public class tab extends tabBoundary {
 				if(scrollable&&vscroll&&sliderv!=null) {
 					s.y = s.by - sliderv.value;
 					s.menu.y = s.y;
-					if(sliderv.mdown)applet.println("tab drawslider smdown",sliderv.value);
+					if(sliderv.mdown)PApplet.println("tab drawslider smdown",sliderv.value);
 				}//				s.mouse = getMouse();
 				s.mouse = mouse;
 				s.parentTab = this;
@@ -1300,6 +1315,7 @@ public class tab extends tabBoundary {
 			if(scrollable&&vscroll&&sliderv!=null)d.y = d.by - sliderv.value;
 			if(scrollable&&hscroll&&sliderh!=null)d.x = d.bx - sliderh.value;
 			if(d.toggle== true&&id!=i)d.toggle=false;
+			d.parentTab = this;
 			d.displayDropdown(canvas);
 			dmdown = false;
 		};
@@ -1809,7 +1825,8 @@ public class tab extends tabBoundary {
 	
 	void setThemeRadius(Theme t) {
 		
-//		theme = t;
+		if(newTheme==null)newTheme = t;
+		theme = newTheme;
 		r1 = theme.tabr1;
 		r2 = theme.tabr2;
 		r3 = theme.tabr3;
@@ -1818,6 +1835,29 @@ public class tab extends tabBoundary {
 		if(title!=null) {
 			r1 = 0;
 			r2 = 0;
+		}
+		if(title!=null) {
+			title.setRadius(theme);
+		}
+
+		for (int i=0; i<buttons.size(); i++) {
+			Button k = buttons.get(i);
+			k.setRadius(theme);
+		}
+
+		for (int i=0; i<dmenus.size(); i++) {
+			Dropdown d1 = dmenus.get(i);
+			d1.setRadius(theme);
+		}
+
+		for (int i=0; i<menus.size(); i++) {
+			Menu m = menus.get(i);
+			m.setRadius(theme);
+		}
+
+		for (int i=0; i<sliderBoxes.size(); i++) {
+			SliderBox s = sliderBoxes.get(i);
+			s.menu.setRadius(theme);
 		}
 	};
 

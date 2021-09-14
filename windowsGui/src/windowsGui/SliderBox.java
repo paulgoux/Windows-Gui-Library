@@ -12,7 +12,7 @@ public class SliderBox{
 	public BMS Bms;
 	public PApplet applet;
 	public float x,y,bx = x,by = y,w,bw = w,h,bh = h,vspacing,hspacing,r1,r2,r3,r4,rx,transparency,ghSpacing,gvSpacing;
-	public int id,cols,rows,themeIndex,arrayIndex;
+	public int id,cols,rows,themeIndex,arrayIndex,tabIndex;
 	Slider sliderR,sliderB,sliderG,sliderSelected;
 	public ArrayList<Slider> sliders = new ArrayList<Slider>();
 	String type;
@@ -28,7 +28,7 @@ public class SliderBox{
 	public fileOutput save;
 	public String savePath = null,itemLabel,label;
 	public int col, bcol, tcol, fcol, hcol,toggleCol;
-	public Theme theme;
+	public Theme theme,newTheme;
 
 	public SliderBox(float xx, float yy,float ww,float hh,float S,String [] Labels,BMS bms) {
 		Bms = bms;
@@ -448,7 +448,7 @@ public class SliderBox{
 			}
 
 		}
-		if(menu.draggable&&menu.drag){
+		if(menu.draggable&&menu.drag&&Bms.getObject()){
 			if(tooltip!=null){
 				tooltip.x = menu.x + menu.w;
 				tooltip.y = menu.y - 50;
@@ -558,7 +558,7 @@ public class SliderBox{
 			}
 		}
 
-		if(menu.draggable&&menu.drag){
+		if(menu.draggable&&menu.drag&&Bms.getObject()){
 			if(tooltip!=null){
 				tooltip.x = menu.x+menu.w;
 				tooltip.y = menu.y - 50;
@@ -763,17 +763,23 @@ public class SliderBox{
 		//important
 		applet.println("save sliderBox");
 		Bms.output.writeLine("");
-		Bms.output.writeLine("sliderBox");
+		Bms.output.writeLine("_sliderBox");
+		if(BMSbound)Bms.output.writeLine(arrayIndex);
+		else Bms.output.writeLine(tabIndex+","+arrayIndex);
 		Bms.output.writeLine("themeIndex",themeIndex);
-		Bms.output.writeLine("localTheme",localTheme);
-//		Bms.output.writeLine("tooltip,"+tooltip);
 		Bms.output.write(x+",");
 		Bms.output.write(y+",");
 		Bms.output.write(w+",");
 		Bms.output.write(h+",");
+		Bms.output.write(menu.sliders.size()+",");
 		Bms.output.writeLine(label+",");
-		
-		
+		Bms.output.writeLine("");
+		for(int i=0;i<menu.sliders.size();i++){
+
+			Slider s = menu.sliders.get(i);
+			
+			Bms.output.writeLine("Slider"+","+i+","+s.value+","+s.valuex+","+s.startvalue+","+s.endvalue);
+		}
 //		Bms.output.write("Type,");
 //		if(menu.classicBar)Bms.output.write("classicBar");
 //		else if(menu.classicSquare)Bms.output.write("cif(lassicSquare");
@@ -783,15 +789,7 @@ public class SliderBox{
 //		}
 //		else if(menu.pieSquare)Bms.output.write("pieSquare");
 //		else Bms.output.write("plain");
-		if(BMSbound)Bms.output.writeLine("BmsBound");
-		Bms.output.writeLine("arrayIndex",arrayIndex);
-		Bms.output.writeLine("");
-		for(int i=0;i<menu.sliders.size();i++){
-
-			Slider s = menu.sliders.get(i);
-			
-			Bms.output.writeLine("Slider:::"+","+i+","+s.value+","+s.valuex+","+s.start+","+s.end);
-		}
+		
 	};
 	
 	public void setColor(){
@@ -1165,6 +1163,123 @@ public class SliderBox{
 		r4 = d;
 		menu.setRadius(a,b,c,d);
 	};
+	
+	public void setTextCol(Theme t) {
+		if(newTheme==null)newTheme = t;
+		theme = newTheme;
+		menu.setTextCol(t);
+	};
+
+	public void setTextCol(Theme t, float a) {
+		
+		newTheme = t;
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+		menu.setTextCol(theme,a);
+		
+		
+	};
+
+	public void setTextCol(Theme t,float a,float b,float c,float d) {
+		newTheme = t;
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		
+	};
+
+	public void setTextSize(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.buttontextsize = a;
+	};
+
+	public void setFillCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.buttonfillcol = applet.color(a);
+	};
+
+	public void setFillCol(Theme theme,float a,float b,float c,float d) {
+		newTheme = theme;
+		theme = newTheme;
+		theme.buttonfillcol = applet.color(a,b,c,d);
+	};
+
+	public void sethCol(Theme theme, float a) {
+		this.theme = theme;
+		newTheme = theme;
+		theme.buttonhcol = applet.color(a);
+	};
+
+	public void sethCol(Theme theme,float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a);
+		theme = newTheme;
+		menu.sethCol(theme, a, b, c, d);
+	};
+
+	public void setTextCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+		menu.setTextCol(a);
+	};
+
+	public void setTextCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		menu.setTextCol(a, b, c, d);
+	};
+	
+	public void setTextColor( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+		menu.setTextColor(a);
+	};
+
+	public void setTextColor(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		menu.setTextCol(a, b, c, d);
+	};
+
+	public void setTextSize( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextsize = applet.color(a);
+		theme = newTheme;
+		menu.setTextSize(a);
+	};
+
+	public void setFillCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonfillcol = applet.color(a);
+		theme = newTheme;
+		menu.setFillCol(a);
+	};
+
+	public void setFillCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonfillcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		menu.setFillCol(a, b, c);
+	};
+
+	public void sethCol( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a);
+		theme = newTheme;
+		menu.sethCol(a);
+	};
+
+	public void sethCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttonhcol = applet.color(a,b,c,d);
+		theme = newTheme;
+		menu.sethCol(a, b, c, d);
+	};
 
 	public void setPieSquare() {
 		menu.setPieSquare();
@@ -1258,24 +1373,34 @@ public class SliderBox{
 		vertical = true;
 		horizontal = false;
 		menu.vertical = true;
+		menu.horizontal = false;
+		float ww = menu.sliders.get(0).w;
+		float hh = menu.sliders.get(0).h;
+		if(menu.radio)ww = ww/4;
 		for(int i=0;i<menu.sliders.size();i++) {
 			Slider s = menu.sliders.get(i);
 			s.vertical = true;
+			applet.println("sliderb setv",s.label,s.vertical);
 			
-			float w = s.w;
-			float h = s.h;
-			s.w = h;
-			s.h = w;
-			s.x = x + i * (s.w);
+			s.w = hh;
+			s.h = ww;
+			if(s.radio) {
+				s.w = hh/8;
+			}
+			
+//			s.x = x + i * 50;
+//			if(s.radio)s.x = x + i * (s.w);
+			
 			s.y = y;
 		}
+		applet.println("sliderb setv",menu.vertical);
 	};
 	
 	public void setHorizontal() {
 		horizontal = true;
 		
 		menu.horizontal = true;
-		if(vertical||pie)
+		if(pie)
 		for(int i=0;i<menu.sliders.size();i++) {
 			Slider s = menu.sliders.get(i);
 			s.vertical = false;

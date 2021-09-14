@@ -414,13 +414,13 @@ public class BMS{
 				output.overWrite = true;
 				output.append = false;
 				output.setSketchLocation("\\data\\preferences0.txt");
-				
+				getButton(0,4).toggle = false;
 				save();
 			}
 			if(toggle(0,5)) {
 //				output.se
 				loadComplete = false;
-				
+				getButton(0,5).toggle = false;
 				load();
 			}
 		}
@@ -718,6 +718,7 @@ public class BMS{
 	};
 
 	public void themeFunctions() {
+		
 		if(themeSettings!=null) {
 			themeSettings.setvScroll(0, 20);
 			Menu m1 = themeSettings.sliderBoxes.get(0).menu;
@@ -725,8 +726,13 @@ public class BMS{
 			Slider g = m1.sliders.get(1);
 			Slider b = m1.sliders.get(2);
 			Slider a = m1.sliders.get(3);
+			if(applet.frameCount<5) {
+				r.pieVal = applet.red(theme.bgcol);
+				g.pieVal = applet.green(theme.bgcol);
+				b.pieVal = applet.blue(theme.bgcol);
+			}
 //			if(r.mdown)applet.println("slider test",r.label,theme.bgcol);
-//			if(r.mdown ||g.mdown||b.mdown)  {
+			if(r.mdown ||g.mdown||b.mdown)  
 				theme.bgcol = applet.color(r.value,g.value,b.value);
 //			}
 			if(a.mdown)theme.setAllTransparency(a.value);
@@ -734,6 +740,7 @@ public class BMS{
 		};
 
 		if(fontSettings!=null) {
+			fontSettings.setvScroll(0, 20);
 			Menu m1 = fontSettings.sliderBoxes.get(0).menu;
 			Slider r = m1.sliders.get(0);
 			Slider g = m1.sliders.get(1);
@@ -742,6 +749,7 @@ public class BMS{
 		}
 
 		if(strokeSettings!=null) {
+			strokeSettings.setvScroll(0, 20);
 			Menu m1 = strokeSettings.sliderBoxes.get(0).menu;
 			Slider r = m1.sliders.get(0);
 			Slider g = m1.sliders.get(1);
@@ -850,7 +858,6 @@ public class BMS{
 			if(windowState==i&&openWindow&&theme.click)s.start();
 			//			if(s.visible)s.draw();
 			//s.menu.drawSliders();
-
 		}
 	};
 
@@ -881,54 +888,372 @@ public class BMS{
 			loadThemes();
 			loadMenu();
 			loadTabs();
-	//		saveButtons();
+			loadButtons();
 	//		saveText();
-			loadSliderBox();
-			loadDMenus();
+			loadSliderBoxes();
+			loadDMenu();
 			loadDock();
 		}
 //		saveWindow();
 		
 	};
 	
-	public void loadMenu() {
+	public void loadTextArea() {
+		PApplet.println("load menus");
 		for(int i=0;i<preferences.length;i++) {
 			String s = preferences[i];
-			if(s.contains("_Menu")) {
+			
+			if(s.contains("_textArea")) {
+				PApplet.println("textArea",s);
 				String s1 = preferences[i+1];
 				String s2 = s1.substring(0, s1.indexOf(","));
 				String sid = s1.replace(s2, "");
+				sid = sid.replace(",", "");
 				int id = -1;
-				
+				//bms textArea index
+				try {
+					PApplet.println("textArea id",sid);
+					id = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+					PApplet.println("textArea id fail",s1,s2,sid);
+//		          break;
+		        }
 				//theme id
-				String menuString = preferences[i+1];
-				String menus2 = s1.substring(0, s1.indexOf(","));
-				String menusid = s1.replace(menus2, "");
-				int menuid = -1;
+				String textAreaThemeString = preferences[i+2];
+				String textAreas2 = textAreaThemeString.substring(0, textAreaThemeString.indexOf(","));
+				String textAreasid = textAreaThemeString.replace(textAreas2, "");
+				textAreasid = textAreasid.replace(",", "");
+				int textAreaid = -1;
+				try {
+//					PApplet.println("theme id",textAreasid);
+					textAreaid = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+
+//		          break;
+		        }
+//				PApplet.println("textArea id",textAreasid);
+				if(id>=0) {
+					TextArea m = textAreas.get(id);
+					m.x = 0;
+					m.y = 0;
+//					PApplet.println("textArea load",id,themes.get(textAreaid));
+					m.theme = themes.get(textAreaid);
+				}else PApplet.println("button load fail",id);
+				
+			}
+		}
+	};
+	
+	public void loadButtons() {
+		PApplet.println("load menus");
+		int bcount = 0;
+		for(int i=0;i<preferences.length;i++) {
+			String s = preferences[i];
+			
+			if(s.contains("_Button")) {
+				bcount++;
+				PApplet.println("button",s);
+				String s1 = preferences[i+1];
+				String s2 = s1.substring(0, s1.indexOf(","));
+				String sid = s1.replace(s2, "");
+				sid = sid.replace(",", "");
+				int id = -1;
+				//bms button index
+				try {
+					PApplet.println("button id",sid);
+					id = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+					PApplet.println("button id fail",s1,s2,sid);
+//		          break;
+		        }
+				//theme id
+				String buttonThemeString = preferences[i+2];
+				String buttons2 = buttonThemeString.substring(0, buttonThemeString.indexOf(","));
+				String buttonsid = buttonThemeString.replace(buttons2, "");
+				buttonsid = buttonsid.replace(",", "");
+				int buttonid = -1;
+				try {
+//					PApplet.println("theme id",buttonsid);
+					buttonid = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+
+//		          break;
+		        }
+//				PApplet.println("button id",buttonsid);
+				if(id>=0) {
+					Button b = buttons.get(id);
+					String _menuDetails = preferences[i+3];
+					String []menuDetails = applet.splitTokens(_menuDetails,",");
+					
+					try {
+						b.x = Float.valueOf(menuDetails[0]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+					try {
+						b.y = Float.valueOf(menuDetails[1]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+//					PApplet.println("button load",id,themes.get(buttonid));
+					b.theme = themes.get(buttonid);
+				}else PApplet.println("button load fail",id);
+				
+			}
+		}
+		PApplet.println("buttons loaded",bcount);
+	};
+	
+	public void loadMenu() {
+		PApplet.println("load menus");
+		int mcount = 0;
+		for(int i=0;i<preferences.length;i++) {
+			String s = preferences[i];
+			
+			if(s.contains("_Menu")) {
+				mcount ++;
+				PApplet.println("menu",s);
+				String s1 = preferences[i+1];
+				String s2 = s1.substring(0, s1.indexOf(","));
+				String sid = s1.replace(s2, "");
+				sid = sid.replace(",", "");
+				int id = -1;
 				//bms menu index
 				try {
 					PApplet.println("menu id",sid);
 					id = Integer.valueOf(sid);
 				}catch(NumberFormatException e) {
-
+					PApplet.println("menu id fail",s1,s2,sid);
 //		          break;
 		        }
-				//bms theme id
+				//theme id
+				String menuThemeString = preferences[i+2];
+				String menus2 = menuThemeString.substring(0, menuThemeString.indexOf(","));
+				String menusid = menuThemeString.replace(menus2, "");
+				menusid = menusid.replace(",", "");
+				int menuid = -1;
 				try {
-					PApplet.println("theme id",menusid);
+//					PApplet.println("theme id",menusid);
 					menuid = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+//		          break;
+		        }
+//				PApplet.println("menu id",menusid);
+				if(id>=0) {
+					Menu m = menus.get(id);
+					String _menuDetails = preferences[i+3];
+					String []menuDetails = applet.splitTokens(_menuDetails,",");
+					
+					try {
+						m.x = Float.valueOf(menuDetails[0]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+					try {
+						m.y = Float.valueOf(menuDetails[1]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+					
+					PApplet.println("menu load",id,themes.get(menuid));
+					m.theme = themes.get(menuid);
+				}else PApplet.println("menu load fail",id);
+				
+			}
+		}
+		
+		PApplet.println("menus loaded:",mcount);
+	};
+	
+	public void loadSliderBoxes() {
+		PApplet.println("load menus");
+		int slbcount = 0;
+		boolean bms = true;
+		int tabIndex = -1;
+		int id = -1;
+		int themeId = -1;
+		for(int i=0;i<preferences.length;i++) {
+			String s = preferences[i];
+			
+			if(s.contains("_sliderBox")) {
+				slbcount ++;
+				PApplet.println("sliderBox",s);
+				String s1 = preferences[i+1];
+				String []index = applet.splitTokens(s1,",");
+				//tab/bms index, id
+//				applet.println("load slb index:",index.length);
+				if(index.length>1) {
+					bms = false;
+					try {
+						tabIndex = Integer.valueOf(index[0]);
+//						applet.println("load slb tabindex:",tabIndex);
+					}catch(NumberFormatException e) {
+						applet.println("load slb tabindex fail:",index[0]);
+			        }
+					
+					try {
+						id = Integer.valueOf(index[1]);
+					}catch(NumberFormatException e) {
+			        }
+				}else {
+					try {
+//						applet.println("load bms slb index size 1",id);
+						tabIndex = -1;
+						id = Integer.valueOf(index[0]);
+					}catch(NumberFormatException e) {
+						applet.println("load bms slb fail",id);
+			        }
+				}
+				//theme id
+				String s2 = preferences[i+2];
+				String _themeIdid = applet.splitTokens(s2,",")[1];
+				try {
+					themeId = Integer.valueOf(_themeIdid);
+				}catch(NumberFormatException e) {
+		        }
+				if(id>=0) {
+					SliderBox slb = null;
+					if(tabIndex>-1) {
+//						applet.println("load tab slb",id);
+						slb = tabs.get(tabIndex).sliderBoxes.get(id);
+					}
+					else {
+//						applet.println("load bms slb",id);
+						slb = sliderBoxes.get(id);
+					}
+					String _slbDetails = preferences[i+3];
+					String []slbDetails = applet.splitTokens(_slbDetails,",");
+					
+					try {
+						slb.x = Float.valueOf(slbDetails[0]);
+//						applet.println("load slb x ",slb.x);
+					}catch(NumberFormatException e) {
+						applet.println("load slb x fail");
+			        }
+					try {
+						slb.y = Float.valueOf(slbDetails[1]);
+//						applet.println("load slb y ",slb.y);
+					}catch(NumberFormatException e) {
+						applet.println("load slb y fail");
+//			          break;
+			        }
+//					slb.set(bb, _slbDetails);
+					int sliders = 0;
+					try {
+						sliders = Integer.valueOf(slbDetails[4]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+					slb.theme = themes.get(themeId);
+//					applet.println("load slb sliders:",sliders,"details",slbDetails[0],slbDetails[1],slbDetails[2],slbDetails[3],slbDetails[4]);
+					for(int k=0;k<sliders;k++) {
+						String _sliderDetails = preferences[i+5+k];
+						applet.println("load slb details",_sliderDetails);
+						try {
+							sliders = Integer.valueOf(_sliderDetails);
+						}catch(NumberFormatException e) {
+//				          break;
+				        }
+						//-------------------------------------------------------------
+						//sliderDetails
+						//---------------------------------------------------------------
+						String []sliderDetails = applet.splitTokens(_sliderDetails,",");
+//						applet.println("load slb sliders: details",sliderDetails[0],sliderDetails[1],sliderDetails[2]);
+						Slider sl = slb.menu.sliders.get(k);
+//						sl.theme = themes.get(sliderbid);
+						try {
+							sl.value = Float.valueOf(sliderDetails[2]);
+							applet.println("load slb sliders: tabIndex",sl.value,"id:",id);
+						}catch(NumberFormatException e) {
+//				          break;
+				        }
+						try {
+							sl.valuex = Float.valueOf(sliderDetails[3]);
+//							applet.println("load slb sliders: valuex",sl.valuex,"id:",id);
+						}catch(NumberFormatException e) {
+//				          break;
+				        }
+						try {
+							sl.startvalue = Float.valueOf(sliderDetails[4]);
+//							applet.println("load slb sliders: startvalue",tabIndex,"id:",id);
+						}catch(NumberFormatException e) {
+				        }
+						
+						try {
+							sl.endvalue = Float.valueOf(sliderDetails[5]);
+//							applet.println("load slb sliders: endvalue",sl.endvalue,"id:",id);
+						}catch(NumberFormatException e) {
+				        }
+						if(slb.pie)sl.pieVal = sl.value;
+					}
+					
+//					PApplet.println("menu load",id,themes.get(sliderbid));
+					
+				}else PApplet.println("sliderBox load fail",id);
+			}
+			if(s.contains("-----------"))break;
+		}
+//		PApplet.println("sliderboxes loaded",slbcount);
+	};
+	
+	public void loadDMenu() {
+		PApplet.println("load DMenus");
+		int dmcount = 0;
+		for(int i=0;i<preferences.length;i++) {
+			String s = preferences[i];
+			
+			if(s.contains("_DropDown")) {
+				dmcount++;
+				PApplet.println("Dmenu",s);
+				String s1 = preferences[i+1];
+				String s2 = s1.substring(0, s1.indexOf(","));
+				String sid = s1.replace(s2, "");
+				sid = sid.replace(",", "");
+				int id = -1;
+				//bms menu index
+				try {
+					PApplet.println("dmenu id",sid);
+					id = Integer.valueOf(sid);
+				}catch(NumberFormatException e) {
+					PApplet.println("dmenu id fail",s1,s2,sid);
+//		          break;
+		        }
+				//theme id
+				String dmenuThemeString = preferences[i+2];
+				String dmenus2 = dmenuThemeString.substring(0, dmenuThemeString.indexOf(","));
+				String dmenusid = dmenuThemeString.replace(dmenus2, "");
+				dmenusid = dmenusid.replace(",", "");
+				int dmenuid = -1;
+				try {
+//					PApplet.println("theme id",menusid);
+					dmenuid = Integer.valueOf(sid);
 				}catch(NumberFormatException e) {
 
 //		          break;
 		        }
-			
-				Menu m = menus.get(id);
-				m.x = 0;
-				m.y = 0;
-				menu.theme = themes.get(m.themeIndex);
+//				PApplet.println("menu id",menusid);
+				if(id>=0) {
+					Dropdown d = dmenus.get(id);
+					String _menuDetails = preferences[i+3];
+					String []menuDetails = applet.splitTokens(_menuDetails,",");
+					
+					try {
+						d.x = Float.valueOf(menuDetails[0]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+					try {
+						d.y = Float.valueOf(menuDetails[1]);
+					}catch(NumberFormatException e) {
+//			          break;
+			        }
+//					PApplet.println("menu load",id,themes.get(menuid));
+					d.theme = themes.get(dmenuid);
+				}else PApplet.println("dmenu load fail",id);
 				
 			}
 		}
+		PApplet.println("dmenus loaded",dmcount);
 	};
 	
 	public void loadTabs() {
@@ -989,11 +1314,7 @@ public class BMS{
 						Theme t = themes.get(id);
 						try{
 							field = t.getClass().getField(key); 
-//							PApplet.println("key:",key,"value:",value);
 							String type = field.getClass().getSimpleName();
-//							type = type.replace("public" , "");
-//							type = type.replace("Field" , "");
-//							field.set(t, value); 
 							if(field.getType().getName()=="boolean"){
 								if(value.contains("true"))
 									try {
@@ -1063,10 +1384,10 @@ public class BMS{
 //						catch (IllegalAccessException e) {
 //						}
 						
-//						if(s2.contains("------------------------------------------------")) {
-//							i = j;
-//							break;
-//						}
+						if(s2.contains("------------------------------------------------")) {
+							i = j;
+							break;
+						}
 						
 						
 						}
@@ -1163,7 +1484,7 @@ public class BMS{
 		for(int i=0;i<menus.size();i++){
 			Menu m = menus.get(i);
 			m.arrayIndex = i;
-			m.save();
+			m.defaultSave();
 		}
 	};
 

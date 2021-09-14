@@ -10,7 +10,7 @@ public class Dropdown extends Menu {
 	public Slider slider;
 	public float windowx,bwindowx,hiddenw,r1,r2,r3,r4,txoff,tyoff;
 	public int dcount,windowSize = 5,arrayIndex;
-	public boolean dclick,visible = true,dclose,draggable,mcoord,BMSbound;
+	public boolean dclick,visible = true,dclose,draggable,mcoord,BMSbound,ddclick;
 	public Button title;
 	public Boundary boundary;
 	public PVector mouse;
@@ -18,6 +18,7 @@ public class Dropdown extends Menu {
 	public Menu subMenu;
 	public Dropdown dMenu;
 	public Theme theme,newTheme;
+	PGraphics c;
 	public Dropdown() {
 
 	};
@@ -61,6 +62,7 @@ public class Dropdown extends Menu {
 		setLabels(Labels);
 
 		windowx = windowSize * h;
+		c = applet.createGraphics((int)w,(int)windowx);
 		bwindowx = windowx;
 		boundary = new Boundary(x,y,w,h,4,bms);
 		setBms(bms);
@@ -86,6 +88,7 @@ public class Dropdown extends Menu {
 
 		windowx = windowSize * h;
 		bwindowx = windowx;
+		c = applet.createGraphics((int)w,(int)windowx);
 		boundary = new Boundary(x,y,w,h,4,bms);
 		setBms(bms);
 	};
@@ -111,6 +114,7 @@ public class Dropdown extends Menu {
 		windowx = windowSize * 20;
 		if(Labels.length>5)setSlider();
 		bwindowx = windowx;
+		c = applet.createGraphics((int)w,(int)windowx);
 		boundary = new Boundary(x,y,w,h,4,bms);
 		//	    setBms(bms);
 	};
@@ -134,7 +138,10 @@ public class Dropdown extends Menu {
 		setLabels(Labels);
 		h = hh;
 		windowx = windowSize * (h+ss);
-		if(Labels.length>5)setSlider();
+		if(Labels.length>5) {
+			setSlider();
+			c = applet.createGraphics((int)w,(int)windowx);
+		}
 		bwindowx = windowx;
 		boundary = new Boundary(x,y,w,h,4,bms);
 		//	    setBms(bms);
@@ -161,7 +168,10 @@ public class Dropdown extends Menu {
 		windowx = windowSize * 20;
 		bwindowx = windowx;
 		setLabels_(Labels);
-		if(Labels.length>5)setSlider_();
+		if(Labels.length>5) {
+			setSlider_();
+			c = applet.createGraphics((int)w,(int)windowx);
+		}
 		h = 20;
 		boundary = new Boundary(x,y,w,h,4,bms);
 		setBms(bms);
@@ -183,7 +193,10 @@ public class Dropdown extends Menu {
 		windowx = windowSize * 20;
 		bwindowx = windowx;
 		setLabels(Labels);
-		if(Labels.length>5)setSlider();
+		if(Labels.length>5) {
+			setSlider();
+			c = applet.createGraphics((int)w,(int)windowx);
+		}
 		boundary = new Boundary(x,y,w,h,4,bms);
 		setBms(bms);
 	};
@@ -328,7 +341,7 @@ public class Dropdown extends Menu {
 			drawLabel(canvas);
 			selfClick(mouse);
 			//if(dclick)
-				drawButtons(canvas);
+			drawButtons(canvas);
 			drawSlider(canvas);
 			drawDragbox(canvas);
 			drag(mouse);
@@ -354,17 +367,25 @@ public class Dropdown extends Menu {
 		r4 = theme.r4;
 		
 	};
+	
 
 	public void drawButtons(){
 
 		dcount = 0;
 		mousePos = new PVector(applet.mouseX,applet.mouseY);
+		float k = 110;
+		PVector mOffset = mousePos = new PVector(applet.mouseX - x,applet.mouseY - y-h);
 		if(dclick&&slider!=null){
 
 			applet.fill(255);
 			applet.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
 			applet.fill(theme.dockfillcol);
 			applet.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
+		}
+		
+		if(items.size()>5) {
+			c.beginDraw();
+			c.background(0);
 		}
 
 		for(int i=0;i<items.size();i++){
@@ -376,51 +397,41 @@ public class Dropdown extends Menu {
 				b.by= y + 20 + 20 * i; 
 			}
 
-			if(slider!=null&&slider.mdown)b.y = b.by - slider.value;
+			if(items.size()>5) {
+				b.y = k + 20 * i;
+				b.by= k + 20 * i; 
+				b.x = 0;
+				if(slider!=null)b.y = b.by - slider.value;
+				if(items.size()>5)b.y = b.y - y;
+			}
 
 			if(slider!=null){
 
-				if(!slider.mdown){
-					if(!dclick)b.visible = false;
-					else if(b.y + b.h < y + h + windowx+1) b.visible = true;
-					if(b.y + b.h > y + h + windowx+1||b.y<y+h-1)b.visible = false;
-				}
-				else {
-					if(b.y + b.h > y + h + windowx+1||b.y<y+h-1)b.visible = false;
-					else b.visible = true;
-				}}
-			else{
+			}else{
 				if(!dclick)b.visible = false;
 				else b.visible = true;
 
 				b.x = x;
 				b.y = y + 20 + 20 * i;
+				b.by = b.y;
 			}
-			if(b.y<y+h-1)b.visible = false;
-			if(b.visible){
-
-				b.draw();
-				b.highlight();
-				if(b.pos(mousePos))dcount++;
-			}
-
-			if(slider!=null){
-
-				if(applet.mousePressed&&b.pos(mousePos)&&b.visible&&!slider.mdown){
+				b.mouse = mOffset;
+				b.draw(c);
+				b.highlight(mOffset);
+				if(b.pos())dcount++;
+				if(ddclick)
+				if(b.toggle(mOffset)) {
+//					index = i;
 					label = b.label;
-					index = i;
 					dclick = false;
+					ddclick = false;
 				}
 			}
-			else{
-				if(applet.mousePressed&&b.pos(mousePos)&&b.visible){
-					label = b.label;
-					index = i;
-					dclick = false;
-				}}}
-		if(slider!=null){if(dcount==0&&applet.mousePressed&&!pos(mousePos)&&!slider.pos(mousePos)&&!slider.mdown)dclick = false;}
-		else if(dcount==0&&applet.mousePressed&&!pos(mousePos))dclick = false;
-		//if(mdown2)dclick
+		
+		if(items.size()>5) {
+			c.endDraw();
+			if(dclick)applet.image(c,x,y+h);
+		}
 	};
 	
 	public void drawItems(PGraphics canvas) {
@@ -486,66 +497,66 @@ public class Dropdown extends Menu {
 	public void drawButtons(PGraphics canvas){
 		setThemeRadius();
 		dcount = 0;
+		mousePos = new PVector(applet.mouseX,applet.mouseY);
+		float k = 110;
+		PVector mOffset = mousePos = new PVector(mouse.x - x,mouse.y - y-h);
 		if(dclick&&slider!=null){
 
-			canvas.fill(theme.dropdownfillcol,theme.dropdowntransparency);
-			canvas.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
+			applet.fill(255);
+//			applet.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
+//			applet.fill(theme.dockfillcol);
+//			applet.rect(x,y+h,w,slider.h,r1,r2,r3,r4);
+		}
+		
+		if(items.size()>5) {
+			c.beginDraw();
+			c.background(0);
 		}
 
 		for(int i=0;i<items.size();i++){
-
 			Button b = items.get(i);
 
 			if(drag){
 				b.x = x;
 				b.y = y + 20 + 20 * i;
 				b.by= y + 20 + 20 * i; 
-			}else {
-				
+			}
+
+			if(items.size()>5) {
+				b.y = k + 20 * i;
+				b.by= k + 20 * i; 
+				b.x = 0;
+				if(slider!=null)b.y = b.by - slider.value;
+				if(items.size()>5)b.y = b.y - y;
+			}
+
+			if(slider!=null){
+
+			}else{
+				if(!dclick)b.visible = false;
+				else b.visible = true;
+
 				b.x = x;
 				b.y = y + 20 + 20 * i;
-				b.by= y + 20 + 20 * i; 
+				b.by = b.y;
 			}
-
-			if(slider!=null)b.y = b.by - (slider.value);
-
-			if(slider!=null){
-				if(!slider.mdown){
-					if(!dclick)b.visible = false;
-					else if(b.y + b.h < y + h + windowx+1)
-						b.visible = true;
-
-				}else {
-					if(b.y + b.h > y + h + windowx+1&&b.y<y+h-1)b.visible = false;
-					else
-						b.visible = true;
-
-				}}else{
-					if(!dclick)b.visible = false;
-					else b.visible = true;
-				}
-			if(b.y<y+h-1)b.visible = false;
-			if(b.y+b.h>y+h+windowx-1)b.visible = false;
-			if(b.visible){
-				b.mouse = mouse;
-				b.parentCanvas = true;
-				b.draw(canvas);
-				b.highlight(mouse);
-				if(b.pos(mouse))dcount++;
-			}
-			if(slider!=null){
-				if(applet.mousePressed&&b.pos(mouse)&&b.visible&&!slider.mdown){
+				b.mouse = mOffset;
+				b.draw(c);
+				b.highlight(mOffset);
+//				if(b.pos())dcount++;
+				if(ddclick)
+				if(b.toggle(mOffset)) {
+//					index = i;
 					label = b.label;
-					index = i;
 					dclick = false;
-				}} else{
-					if(applet.mousePressed&&b.pos(mouse)&&b.visible){
-						label = b.label;
-						index = i;
-						dclick = false;
-					}}}
-		if(slider!=null){if(dcount==0&&applet.mousePressed&&!pos(mouse)&&!slider.pos(mouse)&&!slider.mdown)dclick = false;}
-		else if(dcount==0&&applet.mousePressed&&!pos(mouse))dclick = false;
+					ddclick = false;
+				}
+			}
+		
+		if(items.size()>5) {
+			c.endDraw();
+			if(dclick)canvas.image(c,x,y+h);
+		}
 	};
 
 	public void drawBoundary(){
@@ -583,8 +594,10 @@ public class Dropdown extends Menu {
 		}
 		if(slider!=null&&dclick){
 			slider.draw();
-			slider.mouseFunctions();
-			slider.set(0,(items.size()));
+//			slider.mouseFunctions();
+//			slider.set(0,500);
+//			slider.setEnd(items.size());
+			slider.set(0,items.size()*20);
 		}
 	};
 
@@ -598,7 +611,7 @@ public class Dropdown extends Menu {
 			slider.draw(canvas);
 			slider.mouseFunctions(mouse);
 			//slider.set(0,500);
-			slider.set(0,(items.size()));
+			slider.set(0,items.size()*20);
 		}
 	};
 
@@ -705,10 +718,12 @@ public class Dropdown extends Menu {
 				dclick = true;
 				mdown = true;
 			}
+			if(dclick&&!applet.mousePressed)ddclick = true;
 			if(pos(mousePos)&&applet.mousePressed&&!mdown&&dclick&&!slider.mdown&&!drag){
 				dclick = false;
 				mdown = true;
-			}}
+			}
+			}
 		else{
 
 			if(Bms.dropDownObject==null&&pos(mousePos)&&applet.mousePressed&&!mdown&&!dclick&&!drag){
@@ -725,6 +740,7 @@ public class Dropdown extends Menu {
 		else col = theme.fcol;
 		if(dclick)col = theme.toggleCol;
 		if(dclick&&pos(mousePos))col = applet.color(theme.toggleCol,100);
+//		if(dclick&&!mdown)
 	};
 
 	public void selfClick(PVector mouse){
@@ -734,6 +750,10 @@ public class Dropdown extends Menu {
 //				PApplet.println("dropdown click",Bms.dropDownObject);
 				dclick = true;
 				mdown = true;
+			}
+			if(dclick&&!applet.mousePressed) {
+				ddclick = true;
+//				applet.println("dropdown pv ddclick");
 			}
 			if(pos(mouse)&&applet.mousePressed&&!mdown&&dclick&&!slider.mdown&&!drag){
 				dclick = false;
@@ -811,43 +831,23 @@ public class Dropdown extends Menu {
 
 	};
 	
-	public void setTextColor(int c) {
-		initColors();
-		if(newTheme==null) newTheme = new Theme(Bms);
-		newTheme.dropdowntextcol = c;
-		theme = newTheme;
-	};
-	
-	public void setTextColor(float a, float b,float c,float d) {
-		initColors();
-		if(newTheme==null) newTheme = new Theme(Bms);
-		newTheme.dropdowntextcol = applet.color(a,b,c,d);
-		newTheme.buttontextcol = applet.color(a,b,c,d);
-		theme = newTheme;
-		for(int i=0;i<items.size();i++) {
-			Button b1 = items.get(i);
-			b1.setTextCol(a);
-		}
-	};
-	
-	public void setTextCol(int c) {
-		initColors();
-		tcol = c;
-		localTheme = true;
-	};
-	
-	public void setTextCol(float a, float b,float c,float d) {
-		initColors();
-		tcol = applet.color(a,b,c,d);
-		localTheme = true;
-	};
-	
 	public void save() {
 		
 	};
 	
 	public void defaultSave() {
-		
+		Bms.output.writeLine("");
+		Bms.output.writeLine("_DropDown");
+		if(BMSbound) Bms.output.writeLine("BmsBound");
+		Bms.output.writeLine("arrayIndex",arrayIndex);
+		Bms.output.writeLine("themeIndex",themeIndex);
+		Bms.output.writeLine(x+",");
+		Bms.output.write(y+",");
+		Bms.output.write(w+",");
+		Bms.output.write(h+",");
+		Bms.output.write(label+",");
+		Bms.output.write(index);
+		applet.println("saved DMenu");
 	};
 
 	

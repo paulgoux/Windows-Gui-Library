@@ -164,7 +164,7 @@ public class Button {
 //		Bms.output.reset();
 		Bms.output.setLocation(Bms.dataPath+"\\preferences.txt");
 		Bms.output.writeLine("");
-		Bms.output.writeLine("button");
+		Bms.output.writeLine("_button");
 		if(BMSbound) Bms.output.writeLine("BmsBound");
 		Bms.output.writeLine("arrayIndex",arrayIndex);
 		Bms.output.writeLine("themeIndex",themeIndex);
@@ -476,7 +476,7 @@ public class Button {
 			canvas.rect(x+xoff,y+yoff,w,h,r1,r2,r3,r4);
 
 			if(label!=null){
-
+//				if(parent!=null&&parent.dmenu)applet.println("button",label);
 				canvas.fill(theme.buttontextcol);
 				canvas.textSize(theme.buttontextsize);
 
@@ -820,6 +820,18 @@ public class Button {
 	public boolean toggle() {
 		boolean k = getParent();
 		if(theme.click&&hover&&k) {
+			if(toggle)toggle = false;
+			else toggle = true;
+			//			applet.println("btn toggle",label,theme.click,toggle);
+		}
+
+		return theme.click&&hover;
+	};
+	
+	public boolean toggle(PVector m) {
+//		boolean k = getParent();
+		hover = pos(m);
+		if(theme.click&&hover) {
 			if(toggle)toggle = false;
 			else toggle = true;
 			//			applet.println("btn toggle",label,theme.click,toggle);
@@ -1563,6 +1575,23 @@ public class Button {
 			}
 		}
 	};
+	
+	public void highlightPV(PVector m){
+		hover = false;
+		if(toggle){
+			col = theme.buttontogglecol;
+			if(pos(m)){
+				hover = true;
+				col = theme.buttonhcol;
+			}
+		}else{
+			col = theme.buttonfillcol;
+			if(pos(m)){
+				hover = true;
+				col = theme.buttonhcol;
+			}
+		}
+	};
 
 	public void setLabelOff() {
 		labelVisible = false;
@@ -1640,18 +1669,23 @@ public class Button {
 	};
 
 	public void setRadius(float a) {
-		newTheme = new Theme(applet);
+		if(newTheme==null)newTheme = new Theme(applet);
 		theme = newTheme;
 		theme.buttonr1 = a;
 		theme.buttonr2 = a;
 		theme.buttonr3 = a;
 		theme.buttonr4 = a;
+		r1 = a;
+		r2 = a;
+		r3 = a;
+		r4 = a;
 	};
 	
 	public void setTitleRadius(Theme t) {
 //		theme = t;
 		r1 = theme.buttonr1;
 		r2 = theme.buttonr2;
+		
 	};
 
 	public void setTitleRadius(Theme theme, float a) {
@@ -1661,8 +1695,8 @@ public class Button {
 		theme.buttonr2 = a;
 	};
 
-	public void setTitleRadius(Theme theme, float a,float b) {
-		newTheme = theme;
+	public void setTitleRadius(Theme t, float a,float b) {
+		newTheme = t;
 		theme = newTheme;
 		theme.buttonr1 = a;
 		theme.buttonr2 = b;
@@ -1671,6 +1705,16 @@ public class Button {
 	public void setTitleRadius(float a,float b) {
 		r1 = a;
 		r2 = b;
+	};
+	
+	public void setRadius(Theme t) {
+		newTheme = t;
+		theme = t;
+		
+		r1 = theme.buttonr1;
+		r2 = theme.buttonr2;
+		r3 = theme.buttonr3;
+		r4 = theme.buttonr4;
 	};
 
 	public void setRadius(Theme t, float a) {
@@ -1757,6 +1801,18 @@ public class Button {
 	};
 
 	public void setTextCol(float a,float b,float c,float d) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a,b,c,d);
+		theme = newTheme;
+	};
+	
+	public void setTextColor( float a) {
+		if(newTheme==null) newTheme = new Theme(Bms);
+		newTheme.buttontextcol = applet.color(a);
+		theme = newTheme;
+	};
+
+	public void setTextColor(float a,float b,float c,float d) {
 		if(newTheme==null) newTheme = new Theme(Bms);
 		newTheme.buttontextcol = applet.color(a,b,c,d);
 		theme = newTheme;
